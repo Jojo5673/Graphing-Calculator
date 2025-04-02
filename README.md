@@ -1,5 +1,5 @@
 # Graphing Calculator  
-Submission for COMP1161 course project. A graphing calculator built using **Java** for plotting points on a graphs.
+Submission for COMP1161 course project. A graphing calculator built using **Java** for plotting points on graphs.
 
 ## Features 
 - Create graphs of points and plot lines/curves of best fit.
