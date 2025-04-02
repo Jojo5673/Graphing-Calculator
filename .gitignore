@@ -1,2 +1,22 @@
-.idea
-/*.iml
+#IntelliJ
+.idea/
+*.iml
+
+#BlueJ
+bluej.pkg
+bluej.pkh
+.bluej/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+#Java Build Files
+bin/
+target/
+out/
+*.class
