@@ -2,6 +2,7 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.knowm.xchart.*;
+import org.knowm.xchart.internal.chartpart.ChartZoom;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.knowm.xchart.style.lines.SeriesLines;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -11,8 +12,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class DrawGraph {
     public static void main(String[] args) {
@@ -24,29 +27,10 @@ public class DrawGraph {
         data.add(new Point2D.Double(4, 7));
         data.add(new Point2D.Double(5, 11));
 
-        //SimpleRegression regression = new SimpleRegression();
-//        // Add data points (x, y)
-//        for (Point2D point : data) {
-//            regression.addData(point.getX(), point.getY());
-//        }
-//
-//        // Get the slope (m) and intercept (b) for y = mx + b
-//        double slope = regression.getSlope();
-//        double intercept = regression.getIntercept();
-//
-//        System.out.println("Best-fit line: y = " + slope + "x + " + intercept);
-//
-//        // Generate data for the fitted line
-//        List<Double> xFit = new ArrayList<>();
-//        List<Double> yFit = new ArrayList<>();
-//
-//        for (double x = 0; x <= 6; x += 0.1) {
-//            double y = slope * x + intercept;
-//            xFit.add(x);
-//            yFit.add(y);
-//        }
+        Point2D min_axis = new Point2D.Double(-10, -30);
+        Point2D max_axis = new Point2D.Double(10, 30);
 
-        regression = new LinearRegression(data);
+        regression = new PolynomialRegression(data, 2);
 
         // Plot using XChart
         List<Double> x_data = new ArrayList<>();
@@ -55,16 +39,22 @@ public class DrawGraph {
             x_data.add(point.getX());
             y_data.add(point.getY());
         }
-        XYChart chart = new XYChartBuilder().width(800).height(600).title("Linear Regression").xAxisTitle("X").yAxisTitle("Y").build();
-        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE);
+        XYChart chart = new XYChartBuilder().width(800).height(600).title(regression.modelName).xAxisTitle("X").yAxisTitle("Y").build();
+        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
         chart.addSeries(regression.function, regression.xFit, regression.yFit).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID);
+        chart.addSeries("y=0", new double[]{0, 0}, new double[]{-30, 30}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // y=0 axis
+        chart.addSeries("x=0", new double[]{-30, 30}, new double[]{0, 0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // x=0 axis
+        chart.getStyler().setZoomEnabled(true);
+        chart.getStyler().setZoomResetByButton(true);
 
+        //ChartZoom zoomer = new ChartZoom(chart, chart.get)
         new SwingWrapper<>(chart).displayChart();
     }
 }
 
 abstract class RegressionModel{
     String function;
+    String modelName;
     ArrayList<Double> xFit = new ArrayList<>();
     ArrayList<Double> yFit = new ArrayList<>();
 
@@ -86,31 +76,16 @@ abstract class RegressionModel{
     }
 }
 
-class LinearRegression extends RegressionModel{
-    SimpleRegression regression = new SimpleRegression();
-
-    public LinearRegression(ArrayList<Point2D> data) {
-        for (Point2D point : data) {
-            regression.addData(point.getX(), point.getY());
-        }
-        fit();
-    }
-
-    protected void fit() {
-        double slope = regression.getSlope();
-        double intercept = regression.getIntercept();
-        for (double x = 0; x <= 6; x += 0.1) {
-            double y = slope * x + intercept;
-            xFit.add(x);
-            yFit.add(y);
-        }
-        function = "y = " + slope + "x " + (intercept>=0? "+ "+intercept: "- "+(-intercept));
-    }
-}
-
 class PolynomialRegression extends RegressionModel{
     WeightedObservedPoints points = new WeightedObservedPoints();
     PolynomialCurveFitter fitter;
+    HashMap<Integer, String> models = new HashMap<>(){{
+        put(0, "Constant");
+        put(1, "Linear");
+        put(2, "Quadratic");
+        put(3, "Cubic");
+        put(4, "Quartic");
+    }};
 
     public PolynomialRegression(ArrayList<Point2D> data, int order) {
         for (Point2D point : data) {
@@ -123,32 +98,44 @@ class PolynomialRegression extends RegressionModel{
     protected void fit() {
         double[] coeff = fitter.fit(points.toList());
         StringBuilder function_builder = new StringBuilder("y = ");
+        modelName = models.get(coeff.length - 1);
+
+        for (int i = coeff.length - 1; i >= 0; i--) {
+            if (coeff[i] == 0) continue; // We dont want to include any 0x^n so we dont write 0 coefficients
+
+            // Handle sign formatting
+            if (i == coeff.length - 1) {
+                function_builder.append(String.format("%.3g",coeff[i])); //First term. Negative values keep their sighn
+            } else {
+                //checks if it needs to add a + or - to the coefficient the  adds the coefficient without its normal sign
+                function_builder.append(coeff[i] >= 0 ? " + " : " - ");
+                function_builder.append(String.format("%.3g",Math.abs(coeff[i])));
+            }
+
+            if (i > 0) {
+                function_builder.append("x"); // Append x
+                if (i > 1) function_builder.append("^").append(i); // Append exponent if i > 1 we want to print x instead of x^1
+            }
+        }
+        function = function_builder.toString();
 
         for (double x = 0; x <= 6; x += 0.1) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
                 y += coeff[i] * Math.pow(x, i); // Compute y value
-                if (coeff[i] == 0) continue; // We dont want to include any 0x^n so we dont write 0 coefficients
-
-                // Handle sign formatting
-                if (i == coeff.length - 1) {
-                    function_builder.append(coeff[i]); //First term. Negative values keep their sighn
-                } else {
-                    //checks if it needs to add a + or - to the coefficient the  adds the coefficient without its normal sign
-                    function_builder.append(coeff[i] >= 0 ? " + " : " - ");
-                    function_builder.append(Math.abs(coeff[i]));
-                }
-
-                if (i > 0) {
-                    function_builder.append("x"); // Append x
-                    if (i > 1) function_builder.append("^").append(i); // Append exponent if i > 1 we want to print x instead of x^1
-                }
             }
-
             xFit.add(x);
             yFit.add(y);
-            function = function_builder.toString();
         }
     }
 
+}
+
+class ExponentialRegression extends RegressionModel{
+
+    public ExponentialRegression() {
+    }
+    protected void fit() {
+
+    }
 }
