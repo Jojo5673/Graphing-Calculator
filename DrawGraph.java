@@ -1,8 +1,8 @@
+import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.apache.commons.math3.fitting.SimpleCurveFitter;
 import org.knowm.xchart.*;
-import org.knowm.xchart.internal.chartpart.ChartZoom;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.knowm.xchart.style.lines.SeriesLines;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class DrawGraph {
     public static void main(String[] args) {
@@ -30,8 +29,8 @@ public class DrawGraph {
         Point2D min_axis = new Point2D.Double(-10, -30);
         Point2D max_axis = new Point2D.Double(10, 30);
 
-        regression = new PolynomialRegression(data, 2);
-
+        //regression = new PolynomialRegression(data, 2);
+        regression = new SinusoidalRegression(data);
         // Plot using XChart
         List<Double> x_data = new ArrayList<>();
         List<Double> y_data = new ArrayList<>();
@@ -57,6 +56,7 @@ abstract class RegressionModel{
     String modelName;
     ArrayList<Double> xFit = new ArrayList<>();
     ArrayList<Double> yFit = new ArrayList<>();
+    WeightedObservedPoints points = new WeightedObservedPoints();
 
     protected abstract void fit();
 
@@ -77,9 +77,8 @@ abstract class RegressionModel{
 }
 
 class PolynomialRegression extends RegressionModel{
-    WeightedObservedPoints points = new WeightedObservedPoints();
-    PolynomialCurveFitter fitter;
-    HashMap<Integer, String> models = new HashMap<>(){{
+    private PolynomialCurveFitter fitter;
+    private HashMap<Integer, String> models = new HashMap<>(){{
         put(0, "Constant");
         put(1, "Linear");
         put(2, "Quadratic");
@@ -105,11 +104,11 @@ class PolynomialRegression extends RegressionModel{
 
             // Handle sign formatting
             if (i == coeff.length - 1) {
-                function_builder.append(String.format("%.3g",coeff[i])); //First term. Negative values keep their sighn
+                function_builder.append(String.format("%.3f",coeff[i])); //First term. Negative values keep their sighn
             } else {
                 //checks if it needs to add a + or - to the coefficient the  adds the coefficient without its normal sign
                 function_builder.append(coeff[i] >= 0 ? " + " : " - ");
-                function_builder.append(String.format("%.3g",Math.abs(coeff[i])));
+                function_builder.append(String.format("%.3f",Math.abs(coeff[i])));
             }
 
             if (i > 0) {
@@ -119,7 +118,7 @@ class PolynomialRegression extends RegressionModel{
         }
         function = function_builder.toString();
 
-        for (double x = 0; x <= 6; x += 0.1) {
+        for (double x = -6; x <= 6; x += 0.1) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
                 y += coeff[i] * Math.pow(x, i); // Compute y value
@@ -132,10 +131,218 @@ class PolynomialRegression extends RegressionModel{
 }
 
 class ExponentialRegression extends RegressionModel{
+    private ParametricUnivariateFunction exponential;
 
-    public ExponentialRegression() {
+    public ExponentialRegression(ArrayList<Point2D> data) {
+        for (Point2D point : data) {
+            points.add(point.getX(), point.getY());
+        }
+        //calculates coefficients A and B of function in the form: y = Ae^(Bx)
+        exponential = new ParametricUnivariateFunction() {
+            //implementing methods for the parametric univariate function
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            public double value(double x, double... params) {
+                double a = params[0];
+                double b = params[1];
+                return a * Math.exp(b * x);
+            }
+            public double[] gradient(double x, double... params) {
+                // returns the partial derivatives of the expression with respect to each paramter in an array
+                double b = params[1];
+                double a = params[0];
+                return new double[]{Math.exp(b * x), (a * x * Math.exp(b * x))};
+            }
+        };
+        fit();
+        modelName = "Exponential";
     }
-    protected void fit() {
 
+    protected void fit() {
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(exponential, new double[]{1,1});
+        double[] coeff = fitter.fit(points.toList());
+        for (double x = -6; x <= 6; x += 0.05) {
+            double y = coeff[0] * Math.exp(x * coeff[1]);
+            xFit.add(x);
+            yFit.add(y);
+        }
+
+        function = "y = " + String.format("%.3f", coeff[0]) + "e" + "^{" + String.format("%.3f", coeff[1]) + "x}";
+        System.out.println(function);
+    }
+}
+
+class PowerRegression extends RegressionModel{
+    private ParametricUnivariateFunction power;
+
+    public PowerRegression(ArrayList<Point2D> data) {
+        for (Point2D point : data) {
+            points.add(point.getX(), point.getY());
+        }
+        power = new ParametricUnivariateFunction() {
+            //implementing methods for the parametric univariate function
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            public double value(double x, double... params) {
+                double a = params[0];
+                double b = params[1];
+                return a * Math.pow(x, b);
+            }
+            public double[] gradient(double x, double... params) {
+                // returns the partial derivatives of the expression with respect to each paramter in an array
+                double b = params[1];
+                double a = params[0];
+                return new double[]{Math.pow(x, b), (a * Math.pow(x, b) * Math.log(x))};
+            }
+        };
+        fit();
+        modelName = "Power";
+    }
+
+    protected void fit() {
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(power, new double[]{1,1});
+        double[] coeff = fitter.fit(points.toList());
+        for (double x = -6; x <= 6; x += 0.05) {
+            double y = coeff[0] * Math.pow(x, coeff[1]);
+            xFit.add(x);
+            yFit.add(y);
+        }
+
+        function = "y = " + String.format("%.3f", coeff[0]) + "x" + "^{" + String.format("%.3f", coeff[1]) + "}";
+        System.out.println(function);
+    }
+}
+
+class LogarithmicRegression extends RegressionModel{
+    private ParametricUnivariateFunction logarithmic;
+
+    public LogarithmicRegression(ArrayList<Point2D> data) {
+        for (Point2D point : data) {
+            points.add(point.getX(), point.getY());
+        }
+        logarithmic = new ParametricUnivariateFunction() {
+            //implementing methods for the parametric univariate function
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            public double value(double x, double... params) {
+                double a = params[0];
+                double b = params[1];
+                return a + b * Math.log(x);
+            }
+            public double[] gradient(double x, double... params) {
+                // returns the partial derivatives of the expression with respect to each paramter in an array
+                double b = params[1];
+                double a = params[0];
+                return new double[]{1, (Math.log(x))};
+            }
+        };
+        fit();
+        modelName = "Logarithmic";
+    }
+
+    protected void fit() {
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(logarithmic, new double[]{1,1});
+        double[] coeff = fitter.fit(points.toList());
+        for (double x = -6; x <= 10; x += 0.05) {
+            double y = coeff[0] + coeff[1] * Math.log(x);
+            xFit.add(x);
+            yFit.add(y);
+        }
+
+        function = "y = " + String.format("%.3f", coeff[0]) + " + " + String.format("%.3f", coeff[1]) + "\\ln{x}" ;
+        System.out.println(function);
+    }
+}
+
+class LogisitcRegression extends RegressionModel{
+    private ParametricUnivariateFunction logisitc;
+
+    public LogisitcRegression(ArrayList<Point2D> data) {
+        for (Point2D point : data) {
+            points.add(point.getX(), point.getY());
+        }
+        logisitc = new ParametricUnivariateFunction() {
+            //implementing methods for the parametric univariate function
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            public double value(double x, double... params) {
+                double a = params[0];
+                double b = params[1];
+                double c = params[2];
+                return a / (1 + Math.exp(-b * (x - c)));
+            }
+            public double[] gradient(double x, double... params) {
+                // returns the partial derivatives of the expression with respect to each paramter in an array
+                double b = params[1];
+                double a = params[0];
+                double c = params[2];
+                double expPart = Math.exp(-b * (x - c));
+                double denom = Math.pow(1 + expPart, 2);
+                return new double[]{1/(1+expPart), a * (x-b) * expPart/denom, -a * b * expPart/denom};
+            }
+        };
+        fit();
+        modelName = "Logistic";
+    }
+
+    protected void fit() {
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(logisitc, new double[]{1,1,1});
+        double[] coeff = fitter.fit(points.toList());
+        double a = coeff[0];
+        double b = coeff[1];
+        double c = coeff[2];
+        for (double x = -6; x <= 10; x += 0.05) {
+            double y = a / (1 + Math.exp(-b * (x - c)));
+            xFit.add(x);
+            yFit.add(y);
+        }
+        //y = \frac{a}{1 + e^{-b(x - c)}}
+        function = "y = " + "\\frac{" + String.format("%.3f", a) + "}{ 1 + e^{-" + String.format("%.3f", b) + "(x - " + String.format("%.3f", c) + ")}}";
+        System.out.println(function);
+    }
+}
+
+class SinusoidalRegression extends RegressionModel{
+    private ParametricUnivariateFunction sinusoidal;
+
+    public SinusoidalRegression(ArrayList<Point2D> data) {
+        for (Point2D point : data) {
+            points.add(point.getX(), point.getY());
+        }
+        sinusoidal = new ParametricUnivariateFunction() {
+            //implementing methods for the parametric univariate function
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            public double value(double x, double... params) {
+                double a = params[0];
+                double b = params[1];
+                double c = params[2];
+                double d = params[3];
+                return a * Math.sin(b * x + c) + d;
+            }
+            public double[] gradient(double x, double... params) {
+                // returns the partial derivatives of the expression with respect to each paramter in an array
+                double a = params[0];
+                double b = params[1];
+                double c = params[2];
+                // Partial derivatives w.r.t A, B, C, D
+                double sinTerm = Math.sin(b * x + c);
+                double cosTerm = Math.cos(b * x + c);
+                return new double[] {sinTerm, a * x * cosTerm, b * cosTerm, 1};
+            }
+        };
+        fit();
+        modelName = "Sinusoidal";
+    }
+
+    protected void fit() {
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(sinusoidal, new double[]{0,0,1,1});
+        double[] coeff = fitter.fit(points.toList());
+        double a = coeff[0];
+        double b = coeff[1];
+        double c = coeff[2];
+        double d = coeff[3];
+        for (double x = -6; x <= 10; x += 0.05) {
+            double y = a * Math.sin(b * x + c) + d;
+            xFit.add(x);
+            yFit.add(y);
+        }
+        function = "y = " + String.format("%.3f", a) + "\\sin{\\left(" + String.format("%.3f", b) + "x + "+ String.format("%.3f", c)+"\\right)} + " + String.format("%.3f", d) ;
+        System.out.println(function);
     }
 }
