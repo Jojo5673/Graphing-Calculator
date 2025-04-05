@@ -18,51 +18,63 @@ import java.util.ArrayList;
 
 public class DrawGraph {
     public static void main(String[] args) {
+        //data is stored as an list of points
         ArrayList<Point2D> data = new ArrayList<>();
-        RegressionModel regression;
         data.add(new Point2D.Double(1, 5));
         data.add(new Point2D.Double(2, 3));
         data.add(new Point2D.Double(3, 5));
         data.add(new Point2D.Double(4, 7));
         data.add(new Point2D.Double(5, 11));
 
+       //initalises the model that determines what type of function the curve of best fit will be
+        RegressionModel regression= new SinusoidalRegression(data);
+
+        //TO BE IMPLEMENTED: attempting a system to manage the graph zoom
         Point2D min_axis = new Point2D.Double(-10, -30);
         Point2D max_axis = new Point2D.Double(10, 30);
 
-        //regression = new PolynomialRegression(data, 2);
-        regression = new SinusoidalRegression(data);
-        // Plot using XChart
+        // Plotting the graph
+        //Firstly the plot points need to be obtained and separated into x and y lists
         List<Double> x_data = new ArrayList<>();
         List<Double> y_data = new ArrayList<>();
         for (Point2D point : data) {
             x_data.add(point.getX());
             y_data.add(point.getY());
         }
+        //making the chart window
         XYChart chart = new XYChartBuilder().width(800).height(600).title(regression.modelName).xAxisTitle("X").yAxisTitle("Y").build();
+        //adding the data points and regression curve
         chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
         chart.addSeries(regression.function, regression.xFit, regression.yFit).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID);
+        //drawing x and y axes on the graph sheet
         chart.addSeries("y=0", new double[]{0, 0}, new double[]{-30, 30}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // y=0 axis
         chart.addSeries("x=0", new double[]{-30, 30}, new double[]{0, 0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // x=0 axis
+        //TO BE FLESHED OUT: currently not that useful but you can zoom on the x by selecting a box to view
         chart.getStyler().setZoomEnabled(true);
         chart.getStyler().setZoomResetByButton(true);
 
-        //ChartZoom zoomer = new ChartZoom(chart, chart.get)
+        //displays chart window
+        //TO BE IMPLEMENTED: getting the chart panel and building a custom frame
         new SwingWrapper<>(chart).displayChart();
     }
 }
-
+//Regression model is a base class that forces its children to have a fit funtion
+//also has a base function to render a function in LaTex and stores base information
+//TO BE IMPLEMENTED: Latex rendering
 abstract class RegressionModel{
     String function;
     String modelName;
     ArrayList<Double> xFit = new ArrayList<>();
     ArrayList<Double> yFit = new ArrayList<>();
     WeightedObservedPoints points = new WeightedObservedPoints();
+    //all regression models will have a LaTex function string for rendering, a modelName
+    // also stores points to draw on the graph and points to calculate a curve for
 
     protected abstract void fit();
 
     JPanel DrawFunction(){
         JPanel panel = new JPanel();
-
+        //renders LaTex
         TeXFormula formula = new TeXFormula("E = mc^2");
         TeXIcon icon = formula.createTeXIcon(TeXFormula.SERIF, 50);
         BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -85,13 +97,13 @@ class PolynomialRegression extends RegressionModel{
         put(3, "Cubic");
         put(4, "Quartic");
     }};
-
-    public PolynomialRegression(ArrayList<Point2D> data, int order) {
+    //dictionary to store model names based on which order function the model is being called for
+    public PolynomialRegression(ArrayList<Point2D> data, int order) { // can calulate any order polynomial
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
-        }
-        fitter = PolynomialCurveFitter.create(order);
-        fit();
+        } //obtains point
+        fitter = PolynomialCurveFitter.create(order); //creates fitter object
+        fit(); //calls below funtion
     }
 
     protected void fit() {
