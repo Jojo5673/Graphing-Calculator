@@ -3,6 +3,8 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
 import org.knowm.xchart.*;
+
+import org.knowm.xchart.style.XYStyler;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.knowm.xchart.style.lines.SeriesLines;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -16,76 +18,122 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-public class DrawGraph {
+public class GraphScreen {
     public static void main(String[] args) {
-        //data is stored as an list of points
+        //data is stored as a list of points
         ArrayList<Point2D> data = new ArrayList<>();
+        JFrame frame = new JFrame("Graph");
+
+        //initalises data and a model
+        //TO BE IMPLEMENTED: getting data and model from the ui
         data.add(new Point2D.Double(1, 5));
         data.add(new Point2D.Double(2, 3));
         data.add(new Point2D.Double(3, 5));
         data.add(new Point2D.Double(4, 7));
         data.add(new Point2D.Double(5, 11));
+        RegressionModel regression = new SinusoidalRegression(data);
 
-       //initalises the model that determines what type of function the curve of best fit will be
-        RegressionModel regression= new SinusoidalRegression(data);
+        //displays chart window with equation
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+        frame.add(drawGraph(data, regression, frame), BorderLayout.CENTER);
+        frame.add(regression.RenderEquation(), BorderLayout.EAST);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
-        //TO BE IMPLEMENTED: attempting a system to manage the graph zoom
-        Point2D min_axis = new Point2D.Double(-10, -30);
-        Point2D max_axis = new Point2D.Double(10, 30);
+    private static JPanel drawGraph(ArrayList<Point2D> data, RegressionModel regression, Frame frame) {
+        Point2D min_axis = new Point2D.Double(0, 0);
+        Point2D max_axis = new Point2D.Double(0, 0);
+        Point2D xy_padding;
+        double padding = 0.05; //fraction of scale to pad by
 
         // Plotting the graph
         //Firstly the plot points need to be obtained and separated into x and y lists
         List<Double> x_data = new ArrayList<>();
         List<Double> y_data = new ArrayList<>();
         for (Point2D point : data) {
-            x_data.add(point.getX());
-            y_data.add(point.getY());
+            double y = point.getY();
+            double x = point.getX();
+            x_data.add(x);
+            y_data.add(y);
+            //sets boundaries for drawing points
+            if (y < min_axis.getY())
+                min_axis.setLocation(min_axis.getX(), y);
+            if (y > max_axis.getY())
+                max_axis.setLocation(max_axis.getX(), y);
+            if (x < min_axis.getX())
+                min_axis.setLocation(x, min_axis.getY());
+            if (x > max_axis.getX())
+                max_axis.setLocation(x, max_axis.getY());
         }
+        //calculates padding by applyin the padding % to the width of the points spread
+        double x_pad = padding * (max_axis.getX() - min_axis.getX());
+        double y_pad = padding * (max_axis.getY() - min_axis.getY());
+        xy_padding = new Point2D.Double(x_pad, y_pad);
+
         //making the chart window
         XYChart chart = new XYChartBuilder().width(800).height(600).title(regression.modelName).xAxisTitle("X").yAxisTitle("Y").build();
-        //adding the data points and regression curve
-        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
-        chart.addSeries(regression.function, regression.xFit, regression.yFit).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID);
-        //drawing x and y axes on the graph sheet
-        chart.addSeries("y=0", new double[]{0, 0}, new double[]{-30, 30}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // y=0 axis
-        chart.addSeries("x=0", new double[]{-30, 30}, new double[]{0, 0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.BLACK).setLineWidth(1).setShowInLegend(false); // x=0 axis
-        //TO BE FLESHED OUT: currently not that useful but you can zoom on the x by selecting a box to view
-        chart.getStyler().setZoomEnabled(true);
-        chart.getStyler().setZoomResetByButton(true);
+        XYStyler chartStyler = chart.getStyler();
 
-        //displays chart window
-        //TO BE IMPLEMENTED: getting the chart panel and building a custom frame
-        new SwingWrapper<>(chart).displayChart();
+        //adding the data points and regression curve
+        Point2D min_padded = new Point2D.Double(min_axis.getX() - xy_padding.getX(), min_axis.getY() - xy_padding.getY());
+        Point2D max_padded = new Point2D.Double(max_axis.getX() + xy_padding.getX(), max_axis.getY() + xy_padding.getY());
+        regression.setX_range(min_padded.getX(), max_padded.getX());
+        regression.fit();
+        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
+        chart.addSeries(regression.function, regression.xFit, regression.yFit).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
+
+        //drawing x and y axes on the graph sheet
+        chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
+        chart.addSeries("x=0", new double[]{0,0}, new double[]{min_padded.getY(), max_padded.getY()}).setMarker(SeriesMarkers.NONE); // x=0 axis
+
+        //TO BE FLESHED OUT: currently not that useful but you can zoom on the x by selecting a box to view
+        chartStyler.setZoomEnabled(true);
+        chartStyler.setZoomResetByButton(true);
+        chartStyler.setLegendVisible(false);
+        chartStyler.setChartBackgroundColor(frame.getBackground());
+
+        return new XChartPanel<>(chart);
     }
 }
-//Regression model is a base class that forces its children to have a fit funtion
-//also has a base function to render a function in LaTex and stores base information
-//TO BE IMPLEMENTED: Latex rendering
+
 abstract class RegressionModel{
     String function;
     String modelName;
     ArrayList<Double> xFit = new ArrayList<>();
     ArrayList<Double> yFit = new ArrayList<>();
     WeightedObservedPoints points = new WeightedObservedPoints();
-    //all regression models will have a LaTex function string for rendering, a modelName
-    // also stores points to draw on the graph and points to calculate a curve for
+    double[] x_range;
 
+    //Regression model is a base class that forces its children to have a fit() method and provides a base function to render equations
+    //The fit method generates a math equation for the best fit curve and provides points to plot this best fit curve
+    //all regression models will have a model name and a function string that stores Latex code to render an equation in RenderEquation
+    // also stores points to draw on the graph and points to calculate a curve for
+    //finally it stores an x_range to ensure that the fit points don't exceed the boundaries set for the graph plot
     protected abstract void fit();
 
-    JPanel DrawFunction(){
+    protected JPanel RenderEquation(){
         JPanel panel = new JPanel();
+
         //renders LaTex
-        TeXFormula formula = new TeXFormula("E = mc^2");
-        TeXIcon icon = formula.createTeXIcon(TeXFormula.SERIF, 50);
+        TeXFormula formula = new TeXFormula(function);
+        TeXIcon icon = formula.createTeXIcon(TeXFormula.SERIF, 17);
         BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         icon.paintIcon(null, g2, 0, 0);
 
+        //adds the render to ui
         JLabel label = new JLabel(new ImageIcon(image));
         panel.add(label);
         return panel;
     }
+
+    protected void setX_range(double min, double max) {
+        x_range = new double[]{min, max};
+    }
+
 }
 
 class PolynomialRegression extends RegressionModel{
@@ -103,7 +151,7 @@ class PolynomialRegression extends RegressionModel{
             points.add(point.getX(), point.getY());
         } //obtains point
         fitter = PolynomialCurveFitter.create(order); //creates fitter object
-        fit(); //calls below funtion
+        //calls below funtion
     }
 
     protected void fit() {
@@ -130,7 +178,7 @@ class PolynomialRegression extends RegressionModel{
         }
         function = function_builder.toString();
 
-        for (double x = -6; x <= 6; x += 0.1) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.1) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
                 y += coeff[i] * Math.pow(x, i); // Compute y value
@@ -165,14 +213,13 @@ class ExponentialRegression extends RegressionModel{
                 return new double[]{Math.exp(b * x), (a * x * Math.exp(b * x))};
             }
         };
-        fit();
         modelName = "Exponential";
     }
 
     protected void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(exponential, new double[]{1,1});
         double[] coeff = fitter.fit(points.toList());
-        for (double x = -6; x <= 6; x += 0.05) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.05) {
             double y = coeff[0] * Math.exp(x * coeff[1]);
             xFit.add(x);
             yFit.add(y);
@@ -205,14 +252,13 @@ class PowerRegression extends RegressionModel{
                 return new double[]{Math.pow(x, b), (a * Math.pow(x, b) * Math.log(x))};
             }
         };
-        fit();
         modelName = "Power";
     }
 
     protected void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(power, new double[]{1,1});
         double[] coeff = fitter.fit(points.toList());
-        for (double x = -6; x <= 6; x += 0.05) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.05) {
             double y = coeff[0] * Math.pow(x, coeff[1]);
             xFit.add(x);
             yFit.add(y);
@@ -245,14 +291,13 @@ class LogarithmicRegression extends RegressionModel{
                 return new double[]{1, (Math.log(x))};
             }
         };
-        fit();
         modelName = "Logarithmic";
     }
 
     protected void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(logarithmic, new double[]{1,1});
         double[] coeff = fitter.fit(points.toList());
-        for (double x = -6; x <= 10; x += 0.05) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.05) {
             double y = coeff[0] + coeff[1] * Math.log(x);
             xFit.add(x);
             yFit.add(y);
@@ -289,7 +334,6 @@ class LogisitcRegression extends RegressionModel{
                 return new double[]{1/(1+expPart), a * (x-b) * expPart/denom, -a * b * expPart/denom};
             }
         };
-        fit();
         modelName = "Logistic";
     }
 
@@ -299,7 +343,7 @@ class LogisitcRegression extends RegressionModel{
         double a = coeff[0];
         double b = coeff[1];
         double c = coeff[2];
-        for (double x = -6; x <= 10; x += 0.05) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.05) {
             double y = a / (1 + Math.exp(-b * (x - c)));
             xFit.add(x);
             yFit.add(y);
@@ -319,7 +363,7 @@ class SinusoidalRegression extends RegressionModel{
         }
         sinusoidal = new ParametricUnivariateFunction() {
             //implementing methods for the parametric univariate function
-            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coeffiecients
+            // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coefficients
             public double value(double x, double... params) {
                 double a = params[0];
                 double b = params[1];
@@ -338,7 +382,6 @@ class SinusoidalRegression extends RegressionModel{
                 return new double[] {sinTerm, a * x * cosTerm, b * cosTerm, 1};
             }
         };
-        fit();
         modelName = "Sinusoidal";
     }
 
@@ -349,7 +392,7 @@ class SinusoidalRegression extends RegressionModel{
         double b = coeff[1];
         double c = coeff[2];
         double d = coeff[3];
-        for (double x = -6; x <= 10; x += 0.05) {
+        for (double x = x_range[0];x <= x_range[1]; x += 0.05) {
             double y = a * Math.sin(b * x + c) + d;
             xFit.add(x);
             yFit.add(y);
