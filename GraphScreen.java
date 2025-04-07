@@ -1,6 +1,4 @@
-import RegressionModels.*;
 import org.knowm.xchart.*;
-
 import org.knowm.xchart.style.XYStyler;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.knowm.xchart.style.lines.SeriesLines;
@@ -11,20 +9,19 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.ArrayList;
 
+import RegressionModels.*;
+
 public class GraphScreen {
-    public static void main(String[] args) {
+    public GraphScreen(Graph graph) {
         //data is stored as a list of points
-        ArrayList<Point2D> data = new ArrayList<>();
+
+        ArrayList<Point2D> data = graph.getPoints();
         JFrame frame = new JFrame("Graph");
 
         //initalises data and a model
         //TO BE IMPLEMENTED: getting data and model from the ui
-        data.add(new Point2D.Double(1, 5));
-        data.add(new Point2D.Double(2, 3));
-        data.add(new Point2D.Double(3, 5));
-        data.add(new Point2D.Double(4, 7));
-        data.add(new Point2D.Double(5, 11));
         RegressionModel regression = new SinusoidalRegression(data);
+        graph.setRegression(regression);
 
         //displays chart window with equation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,7 +32,7 @@ public class GraphScreen {
         frame.setVisible(true);
     }
 
-    private static JPanel drawGraph(ArrayList<Point2D> data, RegressionModel regression, Frame frame) {
+    private JPanel drawGraph(ArrayList<Point2D> data, RegressionModel regression, Frame frame) {
         Point2D min_axis = new Point2D.Double(0, 0);
         Point2D max_axis = new Point2D.Double(0, 0);
         Point2D xy_padding;
