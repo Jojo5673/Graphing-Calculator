@@ -6,9 +6,10 @@ import org.knowm.xchart.style.lines.SeriesLines;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Map;
 import RegressionModels.*;
 
 public class GraphScreen {
@@ -81,7 +82,38 @@ public class GraphScreen {
         chartStyler.setZoomEnabled(true).setZoomResetByButton(true).setLegendVisible(false);
         chartStyler.setChartBackgroundColor(frame.getBackground());
 
+        String imagePath = "files/images/" + graph.getId();
+        graph.setImagePath(imagePath + ".png");
+        try {
+            save(chart, imagePath);
+        } catch (IOException e) {
+            System.out.println("Error saving image picture");
+        }
+
         return new XChartPanel<>(chart);
+    }
+
+    private static void save(XYChart saveChart, String filepath) throws IOException {
+        XYChart chart = new XYChartBuilder()
+                .width(saveChart.getWidth())
+                .height(saveChart.getHeight())
+                .build();
+        XYStyler chartStyler = chart.getStyler();
+        XYStyler saveStyler = saveChart.getStyler();
+        Map<String, XYSeries> Series = saveChart.getSeriesMap();
+        for (Map.Entry<String, XYSeries> entry : Series.entrySet()) {
+            XYSeries series = entry.getValue();
+            String name = series.getName();
+            double[] xData = series.getXData();
+            double[] yData = series.getYData();
+
+            chart.addSeries(name, xData, yData).setMarker(series.getMarker()).setLineStyle(series.getLineStyle());
+        }
+        chartStyler.setChartBackgroundColor(saveStyler.getChartBackgroundColor()).setLegendVisible(false);
+        chartStyler.setAxisTicksVisible(false).setAxisTitlesVisible(false).setChartTitleBoxVisible(false);
+        chartStyler.setPlotMargin(0);
+
+        BitmapEncoder.saveBitmapWithDPI(chart, filepath, BitmapEncoder.BitmapFormat.PNG, 300);
     }
 }
 

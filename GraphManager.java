@@ -1,5 +1,4 @@
 import RegressionModels.*;
-
 import com.google.gson.Gson;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -37,7 +36,7 @@ public class GraphManager {
         Graph graph2 = new Graph("Test Graph2", data2);
         graph2.setRegression(new PolynomialRegression(data2, 2));
         graph.setConnect_points(true);
-        //graph.setRegression(new SinusoidalRegression(data));
+        graph.setRegression(new SinusoidalRegression(data));
 
         //TO BE IMPLEMENTED: getting data and model from the ui
 

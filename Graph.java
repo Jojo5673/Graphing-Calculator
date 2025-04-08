@@ -5,14 +5,14 @@ import java.time.Instant;
 import RegressionModels.*;
 
 public class Graph {
-    private int id;
-    private static int nextId = 0;
+    private String id;
     private String title;
     private ArrayList<Point2D.Double> points;
     private transient RegressionModel regression = null;   //marked transient to avoid showing
     private String modelName = "";
     private Instant timeStamp;
     private Boolean connect_points = false;
+    private String imagePath = "";
 
     public Graph() {}
 
@@ -20,24 +20,30 @@ public class Graph {
     public RegressionModel getRegression() {return regression;}
     public ArrayList<Point2D.Double> getPoints() {return points;}
     public String getTitle() {return title;}
-    public int getId() {return id;}
+    public String getId() {return id;}
     public Instant getTimeStamp() {return timeStamp;}
+    public String getImagePath() {return imagePath;}
 
+    public void setImagePath(String imagePath) {this.imagePath = imagePath;}
     public void setConnect_points(Boolean connect_points) {this.connect_points = connect_points;}
+    public void setPoints(ArrayList<Point2D.Double> points) {this.points = points;}
+    public void setTitle(String title) {this.title = title;}
     public void setRegression(RegressionModel regression) {
         this.regression = regression;
         this.modelName = regression.getModelName();
     }
-    public void setPoints(ArrayList<Point2D.Double> points) {this.points = points;}
-    public void setTitle(String title) {this.title = title;}
 
     public Graph(String title, ArrayList<Point2D.Double> points) {
         this.title = title;
         this.points = points;
-        this.id = nextId++;
+        GenerateID();
         this.timeStamp = Instant.now();
     }
 
+    private void GenerateID(){
+        String base = title.toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9\\-]", "");
+        id = base + "-" + Instant.now().toEpochMilli();
+    }
     public void LoadRegression() {
         switch (modelName) {
             case "Sinusoidal":
