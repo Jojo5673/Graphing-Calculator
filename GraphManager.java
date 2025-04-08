@@ -36,7 +36,10 @@ public class GraphManager {
         Graph graph = new Graph("Test Graph", data);
         Graph graph2 = new Graph("Test Graph2", data2);
         graph2.setRegression(new PolynomialRegression(data2, 2));
-        graph.setRegression(new SinusoidalRegression(data));
+        graph.setConnect_points(true);
+        //graph.setRegression(new SinusoidalRegression(data));
+
+        //TO BE IMPLEMENTED: getting data and model from the ui
 
         //saving graphs to the file
         ArrayList<Graph> graphs = new ArrayList<>();

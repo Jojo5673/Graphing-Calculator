@@ -15,13 +15,13 @@ public class GraphScreen {
     public static void plot(Graph graph) {
         //data is stored as a list of points
         JFrame frame = new JFrame("Graph");
-        //TO BE IMPLEMENTED: getting data and model from the ui
 
         //displays chart window with equation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 200);
         frame.add(drawGraph(graph, frame), BorderLayout.CENTER);
-        frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
+        if (graph.getRegression() != null)
+            frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
         frame.pack();
         frame.setVisible(true);
     }
@@ -65,19 +65,20 @@ public class GraphScreen {
         //adding the data points and regression curve
         Point2D min_padded = new Point2D.Double(min_axis.getX() - xy_padding.getX(), min_axis.getY() - xy_padding.getY());
         Point2D max_padded = new Point2D.Double(max_axis.getX() + xy_padding.getX(), max_axis.getY() + xy_padding.getY());
-        regression.setX_range(min_padded.getX(), max_padded.getX());
-        regression.fit();
-        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
-        chart.addSeries(regression.getModelName(), regression.getxFit(), regression.getyFit()).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
+
+        //plots points. connects dots if necessary as shown my the ternary operator in set line style
+        chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(graph.isConnect_points()?SeriesLines.SOLID:SeriesLines.NONE).setShowInLegend(false);
+        if (regression != null) {
+            regression.setX_range(min_padded.getX(), max_padded.getX());
+            regression.fit();
+            chart.addSeries(regression.getModelName(), regression.getxFit(), regression.getyFit()).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
+        }
 
         //drawing x and y axes on the graph sheet
         chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
         chart.addSeries("x=0", new double[]{0,0}, new double[]{min_padded.getY(), max_padded.getY()}).setMarker(SeriesMarkers.NONE); // x=0 axis
 
-        //TO BE FLESHED OUT: currently not that useful but you can zoom on the x by selecting a box to view
-        chartStyler.setZoomEnabled(true);
-        chartStyler.setZoomResetByButton(true);
-        chartStyler.setLegendVisible(false);
+        chartStyler.setZoomEnabled(true).setZoomResetByButton(true).setLegendVisible(false);
         chartStyler.setChartBackgroundColor(frame.getBackground());
 
         return new XChartPanel<>(chart);

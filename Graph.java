@@ -10,13 +10,13 @@ public class Graph {
     private String title;
     private ArrayList<Point2D.Double> points;
     private transient RegressionModel regression = null;   //marked transient to avoid showing
-    private String modelName = null;
+    private String modelName = "";
     private Instant timeStamp;
     private Boolean connect_points = false;
 
     public Graph() {}
 
-    public Boolean getConnect_points() {return connect_points;}
+    public Boolean isConnect_points() {return connect_points;}
     public RegressionModel getRegression() {return regression;}
     public ArrayList<Point2D.Double> getPoints() {return points;}
     public String getTitle() {return title;}

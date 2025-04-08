@@ -24,9 +24,9 @@
         "y": 11.0
       }
     ],
-    "modelName": "Sinusoidal",
-    "timeStamp": "2025-04-08T02:51:45.689254900Z",
-    "connect_points": false
+    "modelName": "",
+    "timeStamp": "2025-04-08T16:42:36.362214300Z",
+    "connect_points": true
   },
   {
     "id": 1,
@@ -54,7 +54,7 @@
       }
     ],
     "modelName": "Quadratic",
-    "timeStamp": "2025-04-08T02:51:45.689254900Z",
+    "timeStamp": "2025-04-08T16:42:36.362214300Z",
     "connect_points": false
   }
 ]
