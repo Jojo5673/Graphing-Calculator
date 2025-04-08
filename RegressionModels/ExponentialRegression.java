@@ -1,5 +1,6 @@
 package RegressionModels;
 
+import com.google.gson.annotations.Expose;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 public class ExponentialRegression extends RegressionModel {
     private ParametricUnivariateFunction exponential;
 
-    public ExponentialRegression(ArrayList<Point2D> data) {
+    public ExponentialRegression(ArrayList<Point2D.Double> data) {
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
         }
@@ -36,7 +37,7 @@ public class ExponentialRegression extends RegressionModel {
     public void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(exponential, new double[]{1, 1});
         double[] coeff = fitter.fit(points.toList());
-        for (double x = x_range[0]; x <= x_range[1]; x += 0.05) {
+        for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] * Math.exp(x * coeff[1]);
             xFit.add(x);
             yFit.add(y);

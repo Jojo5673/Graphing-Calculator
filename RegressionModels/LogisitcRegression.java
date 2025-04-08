@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class LogisitcRegression extends RegressionModel {
     private ParametricUnivariateFunction logisitc;
 
-    public LogisitcRegression(ArrayList<Point2D> data) {
+    public LogisitcRegression(ArrayList<Point2D.Double> data) {
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
         }
@@ -42,7 +42,7 @@ public class LogisitcRegression extends RegressionModel {
         double a = coeff[0];
         double b = coeff[1];
         double c = coeff[2];
-        for (double x = x_range[0]; x <= x_range[1]; x += 0.05) {
+        for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = a / (1 + Math.exp(-b * (x - c)));
             xFit.add(x);
             yFit.add(y);

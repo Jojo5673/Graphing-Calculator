@@ -1,6 +1,7 @@
 package RegressionModels;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
+import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
@@ -10,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public abstract class RegressionModel {
+    protected double detail = 0.1; //sets how many fit points are created
     protected String function;
     protected String modelName;
     protected ArrayList<Double> xFit = new ArrayList<>();
@@ -30,20 +32,22 @@ public abstract class RegressionModel {
     public abstract void fit();
 
     public JPanel RenderEquation() {
+        JLabel label = new JLabel();
         JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         //renders LaTex
         TeXFormula formula = new TeXFormula(function);
-        TeXIcon icon = formula.createTeXIcon(TeXFormula.SERIF, 17);
-        BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D) image.getGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        icon.paintIcon(null, g2, 0, 0);
+        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 26);
+        BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        icon.paintIcon(label, image.getGraphics(), 0, 0);
 
         //adds the render to ui
-        JLabel label = new JLabel(new ImageIcon(image));
-        panel.add(label);
-        return panel;
+       label.setIcon(icon);
+       panel.add(Box.createVerticalGlue());
+       panel.add(label);
+       panel.add(Box.createVerticalGlue());
+       return panel;
     }
 
     public void setX_range(double min, double max) {

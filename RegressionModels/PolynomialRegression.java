@@ -9,7 +9,6 @@ import java.util.HashMap;
 public class PolynomialRegression extends RegressionModel {
     private PolynomialCurveFitter fitter;
     private HashMap<Integer, String> models = new HashMap<>() {{
-        put(0, "Constant");
         put(1, "Linear");
         put(2, "Quadratic");
         put(3, "Cubic");
@@ -17,18 +16,17 @@ public class PolynomialRegression extends RegressionModel {
     }};
 
     //dictionary to store model names based on which order function the model is being called for
-    public PolynomialRegression(ArrayList<Point2D> data, int order) { // can calulate any order polynomial
+    public PolynomialRegression(ArrayList<Point2D.Double> data, int order) { // can calulate any order polynomial
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
         } //obtains point
         fitter = PolynomialCurveFitter.create(order); //creates fitter object
-        //calls below funtion
+        modelName = models.get(order);
     }
 
     public void fit() {
         double[] coeff = fitter.fit(points.toList());
         StringBuilder function_builder = new StringBuilder("y = ");
-        modelName = models.get(coeff.length - 1);
 
         for (int i = coeff.length - 1; i >= 0; i--) {
             if (coeff[i] == 0) continue; // We dont want to include any 0x^n so we dont write 0 coefficients
@@ -50,7 +48,7 @@ public class PolynomialRegression extends RegressionModel {
         }
         function = function_builder.toString();
 
-        for (double x = x_range[0]; x <= x_range[1]; x += 0.1) {
+        for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
                 y += coeff[i] * Math.pow(x, i); // Compute y value

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class PowerRegression extends RegressionModel {
     private ParametricUnivariateFunction power;
 
-    public PowerRegression(ArrayList<Point2D> data) {
+    public PowerRegression(ArrayList<Point2D.Double> data) {
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
         }
@@ -35,7 +35,7 @@ public class PowerRegression extends RegressionModel {
     public void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(power, new double[]{1, 1});
         double[] coeff = fitter.fit(points.toList());
-        for (double x = x_range[0]; x <= x_range[1]; x += 0.05) {
+        for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] * Math.pow(x, coeff[1]);
             xFit.add(x);
             yFit.add(y);

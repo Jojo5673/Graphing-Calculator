@@ -1,5 +1,6 @@
 package RegressionModels;
 
+import com.google.gson.annotations.Expose;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
 
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 public class SinusoidalRegression extends RegressionModel {
     private ParametricUnivariateFunction sinusoidal;
 
-    public SinusoidalRegression(ArrayList<Point2D> data) {
+    public SinusoidalRegression(ArrayList<Point2D.Double> data) {
         for (Point2D point : data) {
             points.add(point.getX(), point.getY());
         }
-        sinusoidal = new ParametricUnivariateFunction() {
+        this.sinusoidal = new ParametricUnivariateFunction() {
             //implementing methods for the parametric univariate function
             // this class is passed to a fitter which uses expressions for the y value and gradient to calculate coefficients
             public double value(double x, double... params) {
@@ -45,7 +46,7 @@ public class SinusoidalRegression extends RegressionModel {
         double b = coeff[1];
         double c = coeff[2];
         double d = coeff[3];
-        for (double x = x_range[0]; x <= x_range[1]; x += 0.05) {
+        for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = a * Math.sin(b * x + c) + d;
             xFit.add(x);
             yFit.add(y);

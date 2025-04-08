@@ -12,31 +12,27 @@ import java.util.ArrayList;
 import RegressionModels.*;
 
 public class GraphScreen {
-    public GraphScreen(Graph graph) {
+    public static void plot(Graph graph) {
         //data is stored as a list of points
-
-        ArrayList<Point2D> data = graph.getPoints();
         JFrame frame = new JFrame("Graph");
-
-        //initalises data and a model
         //TO BE IMPLEMENTED: getting data and model from the ui
-        RegressionModel regression = new SinusoidalRegression(data);
-        graph.setRegression(regression);
 
         //displays chart window with equation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 200);
-        frame.add(drawGraph(data, regression, frame), BorderLayout.CENTER);
-        frame.add(regression.RenderEquation(), BorderLayout.EAST);
+        frame.add(drawGraph(graph, frame), BorderLayout.CENTER);
+        frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
         frame.pack();
         frame.setVisible(true);
     }
 
-    private JPanel drawGraph(ArrayList<Point2D> data, RegressionModel regression, Frame frame) {
+    private static JPanel drawGraph(Graph graph, Frame frame) {
         Point2D min_axis = new Point2D.Double(0, 0);
         Point2D max_axis = new Point2D.Double(0, 0);
         Point2D xy_padding;
         double padding = 0.05; //fraction of scale to pad by
+        ArrayList<Point2D.Double> data = graph.getPoints();
+        RegressionModel regression = graph.getRegression();
 
         // Plotting the graph
         //Firstly the plot points need to be obtained and separated into x and y lists
@@ -63,7 +59,7 @@ public class GraphScreen {
         xy_padding = new Point2D.Double(x_pad, y_pad);
 
         //making the chart window
-        XYChart chart = new XYChartBuilder().width(800).height(600).title(regression.getModelName()).xAxisTitle("X").yAxisTitle("Y").build();
+        XYChart chart = new XYChartBuilder().width(800).height(600).title(graph.getTitle()).xAxisTitle("X").yAxisTitle("Y").build();
         XYStyler chartStyler = chart.getStyler();
 
         //adding the data points and regression curve
@@ -72,7 +68,7 @@ public class GraphScreen {
         regression.setX_range(min_padded.getX(), max_padded.getX());
         regression.fit();
         chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(SeriesLines.NONE).setShowInLegend(false);
-        chart.addSeries(regression.getFunction(), regression.getxFit(), regression.getyFit()).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
+        chart.addSeries(regression.getModelName(), regression.getxFit(), regression.getyFit()).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
 
         //drawing x and y axes on the graph sheet
         chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
