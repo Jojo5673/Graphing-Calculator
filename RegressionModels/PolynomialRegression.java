@@ -8,12 +8,6 @@ import java.util.HashMap;
 
 public class PolynomialRegression extends RegressionModel {
     private PolynomialCurveFitter fitter;
-    private HashMap<Integer, String> models = new HashMap<>() {{
-        put(1, "Linear");
-        put(2, "Quadratic");
-        put(3, "Cubic");
-        put(4, "Quartic");
-    }};
 
     //dictionary to store model names based on which order function the model is being called for
     public PolynomialRegression(ArrayList<Point2D.Double> data, int order) { // can calulate any order polynomial
@@ -21,6 +15,12 @@ public class PolynomialRegression extends RegressionModel {
             points.add(point.getX(), point.getY());
         } //obtains point
         fitter = PolynomialCurveFitter.create(order); //creates fitter object
+        HashMap<Integer, String> models = new HashMap<>() {{
+            put(1, "Linear");
+            put(2, "Quadratic");
+            put(3, "Cubic");
+            put(4, "Quartic");
+        }};
         modelName = models.get(order);
     }
 
