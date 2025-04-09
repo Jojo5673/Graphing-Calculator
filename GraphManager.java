@@ -2,11 +2,11 @@ import RegressionModels.*;
 import com.google.gson.Gson;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -53,7 +53,6 @@ public class GraphManager {
         graph.setConnect_points(true);
         graph.setRegression(new SinusoidalRegression(data));
 
-
         //DEMONSTRATION OF FILE READ/WRITE WITH GRAPHS
         //they are written by passing an arraylist of any amount of graphs to writeGraphs()
         //they are read in arraylists as well
@@ -95,6 +94,18 @@ public class GraphManager {
         for (Graph g : graphs) {
             g.LoadRegression(); //this sets the regression based on the regression model's name stored for the graph.
             //we are unable to store regression models. they are a bit too complex and writing logic to make Gson parse it is too much work
+        }
+
+        //code to clean up unused images
+        //graphs only store their image path so when a graph gets deleted or replaced in the file, its image stays
+        //this code checks for the used image paths and deletes the garbage
+        File folder = new File("files/images"); //gets the images folder
+        List<String> usedImages = graphs.stream().map(Graph::getImagePath).toList(); //creates a list of the stored image paths
+        //loops through the images in the folder and if it was not in the list of used images it gets packed up
+        for (File image: folder.listFiles()) {
+            if (!usedImages.contains(image.getPath())) {
+                image.delete();
+            }
         }
         return graphs;
     }
