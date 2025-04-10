@@ -51,6 +51,73 @@ public class GraphScreen {
             frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
         frame.pack();
         frame.setVisible(true);
+
+        //Button Logic
+        saveButton.addActionListener(e->{
+            String name = JOptionPane.showInputDialog(frame,"Enter graph name:");
+
+            if(name == null || name.trim().isEmpty()){
+                JOptionPane.showMessageDialog(frame,"No name provided");
+                return;
+            }
+
+            Graph g = buildFromInput(name.trim(),pointArea.getText(),(String) regressionMenu.getSelectedItem(),connectPoints.isSelected(),frame);
+
+            if (g!=null){
+                try{
+                    ArrayList<Graph> graphs = GraphManager.readGraphs();
+                    graphs.add(g);
+                    GraphManager.writeGraphs(graphs);
+                    JOptionPane.showMessageDialog(frame,"Graph Saved");
+                }catch(IOException ex){
+                    JOptionPane.showMessageDialog(frame,"Error saving graph: " +ex.getMessage());
+                }
+
+            }
+        });
+
+    }
+
+    private static Graph buildFromInput(String title, String newPoints, String regType, boolean connect,Component parent){
+        String[] lines = newPoints.split("\\n");
+        ArrayList<Point2D.Double> points = new ArrayList<>();
+        for (String line:lines){
+            try{
+                String[] parts = line.split(",");
+                double x = Double.parseDouble(parts[0].trim());
+                double y = Double.parseDouble(parts[1].trim());
+                points.add(new Point2D.Double(x,y));
+            } catch(Exception e){
+                JOptionPane.showMessageDialog(parent, "Invalid point format: " + line);
+                return null;
+            }
+        }
+
+        Graph graph = new Graph(title, points);
+        graph.setConnect_points(connect);
+
+        switch(regType){
+            case "Exponential" -> graph.setRegression(new ExponentialRegression(points));
+            case "Logarithmic" -> graph.setRegression(new LogarithmicRegression(points));
+            case "Logistic" -> graph.setRegression(new LogisitcRegression(points));
+            case "Polynomial" -> {
+                String input = JOptionPane.showInputDialog("Enter the order(1-4): ");
+
+                int order = 2; //default to quadratic
+                try {
+                    order = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Invalid input. Defaulting to order 2");
+                }
+                graph.setRegression(new PolynomialRegression(points,order));
+            }
+
+            case "Power" -> graph.setRegression(new PowerRegression(points));
+            case "Sinusoidal" -> graph.setRegression(new SinusoidalRegression(points));
+        }
+
+
+        return graph;
     }
 
     private static JPanel drawGraph(Graph graph, Frame frame) {
