@@ -23,6 +23,30 @@ public class GraphScreen {
         //adds the graph panel
         frame.add(drawGraph(graph, frame), BorderLayout.CENTER);
         //adds the equation panel is there is a regression stored for the graph
+
+        //Control panels
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+
+        JTextArea pointArea = new JTextArea(5,20);
+        JComboBox<String> regressionMenu = new JComboBox<>(new String[]{
+                "None", "Exponential", "Logarithmic", "Logistic", "Polynomial", "Power", "Sinusoidal"
+        });
+        regressionMenu.setMaximumSize(new Dimension(1500,100));
+
+        JCheckBox connectPoints = new JCheckBox("Connect Points");
+        JButton saveButton = new JButton("Save Graph");
+
+        controlPanel.add(new JLabel("Points (x,y per line):"));
+        controlPanel.add(new JScrollPane(pointArea));
+        controlPanel.add(new JLabel("Regression Type:"));
+        controlPanel.add(regressionMenu);
+        controlPanel.add(connectPoints);
+        controlPanel.add(saveButton);
+
+        frame.add(controlPanel, BorderLayout.WEST);
         if (graph.getRegression() != null)
             frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
         frame.pack();
