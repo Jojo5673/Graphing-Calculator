@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.nio.channels.NotYetBoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class GraphScreen {
         regressionMenu.setMaximumSize(new Dimension(1500,100));
 
         JCheckBox connectPoints = new JCheckBox("Connect Points");
+        JButton plotButton = new JButton("Plot Graph");
         JButton saveButton = new JButton("Save Graph");
 
         controlPanel.add(new JLabel("Points (x,y per line):"));
@@ -44,6 +46,7 @@ public class GraphScreen {
         controlPanel.add(new JLabel("Regression Type:"));
         controlPanel.add(regressionMenu);
         controlPanel.add(connectPoints);
+        controlPanel.add(plotButton);
         controlPanel.add(saveButton);
 
         frame.add(controlPanel, BorderLayout.WEST);
@@ -53,6 +56,20 @@ public class GraphScreen {
         frame.setVisible(true);
 
         //Button Logic
+        plotButton.addActionListener(e -> {
+            Graph g = buildFromInput("Untitled", pointArea.getText(), (String) regressionMenu.getSelectedItem(), connectPoints.isSelected(), frame);
+            if (g != null) {
+                JPanel newGraphPanel = drawGraph(g, frame);
+                frame.getContentPane().removeAll(); // clear old content
+                frame.add(controlPanel, BorderLayout.WEST);
+                frame.add(newGraphPanel, BorderLayout.CENTER);
+                if (g.getRegression() != null) {
+                    frame.add(g.getRegression().RenderEquation(), BorderLayout.EAST);
+                }
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
         saveButton.addActionListener(e->{
             String name = JOptionPane.showInputDialog(frame,"Enter graph name:");
 
@@ -106,6 +123,7 @@ public class GraphScreen {
                 int order = 2; //default to quadratic
                 try {
                     order = Integer.parseInt(input);
+                    if(order<1||order>4) throw new NumberFormatException();
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Invalid input. Defaulting to order 2");
                 }
