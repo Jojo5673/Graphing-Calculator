@@ -25,22 +25,22 @@ public class GraphScreen {
         frame.add(drawGraph(graph, frame), BorderLayout.CENTER);
         //adds the equation panel is there is a regression stored for the graph
 
-        //Control panels
+        //Control panels for input and options
         JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-        controlPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));//Gives a vertical layout
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));//Padding around panel
 
 
-        JTextArea pointArea = new JTextArea(5,20);
-        JComboBox<String> regressionMenu = new JComboBox<>(new String[]{
+        JTextArea pointArea = new JTextArea(5,20);//Text Area for points
+        JComboBox<String> regressionMenu = new JComboBox<>(new String[]{//Drop down menu for regression
                 "None", "Exponential", "Logarithmic", "Logistic", "Polynomial", "Power", "Sinusoidal"
         });
-        regressionMenu.setMaximumSize(new Dimension(1500,100));
+        regressionMenu.setMaximumSize(new Dimension(1500,100));//Change dimension of drop down
 
-        JCheckBox connectPoints = new JCheckBox("Connect Points");
-        JButton plotButton = new JButton("Plot Graph");
-        JButton saveButton = new JButton("Save Graph");
-
+        JCheckBox connectPoints = new JCheckBox("Connect Points");//Checkbox for connecting points
+        JButton plotButton = new JButton("Plot Graph");//Button to plot graph
+        JButton saveButton = new JButton("Save Graph");//Button to save graph
+        //Adding components to panel
         controlPanel.add(new JLabel("Points (x,y per line):"));
         controlPanel.add(new JScrollPane(pointArea));
         controlPanel.add(new JLabel("Regression Type:"));
@@ -49,16 +49,19 @@ public class GraphScreen {
         controlPanel.add(plotButton);
         controlPanel.add(saveButton);
 
+        //Add the control panel and regression to display frame
         frame.add(controlPanel, BorderLayout.WEST);
         if (graph.getRegression() != null)
-            frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);
+            frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);//Add updated equation panel
         frame.pack();
         frame.setVisible(true);
 
-        //Button Logic
+        //Plot Button Logic
         plotButton.addActionListener(e -> {
+            //Create graph from user input
             Graph g = buildFromInput("Untitled", pointArea.getText(), (String) regressionMenu.getSelectedItem(), connectPoints.isSelected(), frame);
             if (g != null) {
+                //Replaces current graph display with new one
                 JPanel newGraphPanel = drawGraph(g, frame);
                 frame.getContentPane().removeAll(); // clear old content
                 frame.add(controlPanel, BorderLayout.WEST);
@@ -66,22 +69,25 @@ public class GraphScreen {
                 if (g.getRegression() != null) {
                     frame.add(g.getRegression().RenderEquation(), BorderLayout.EAST);
                 }
-                frame.revalidate();
-                frame.repaint();
+                frame.revalidate();//Refreshes the layout
+                frame.repaint();//Repaints the frame
             }
         });
+        //Save Button Logic
         saveButton.addActionListener(e->{
+            //Prompt that asks user for the name of the graph
             String name = JOptionPane.showInputDialog(frame,"Enter graph name:");
 
             if(name == null || name.trim().isEmpty()){
                 JOptionPane.showMessageDialog(frame,"No name provided");
                 return;
             }
-
+            //Create graph
             Graph g = buildFromInput(name.trim(),pointArea.getText(),(String) regressionMenu.getSelectedItem(),connectPoints.isSelected(),frame);
 
             if (g!=null){
                 try{
+                    //Adds and saves the graph to the graph file
                     ArrayList<Graph> graphs = GraphManager.readGraphs();
                     graphs.add(g);
                     GraphManager.writeGraphs(graphs);
@@ -94,8 +100,9 @@ public class GraphScreen {
         });
 
     }
-
+    //Builds a graph from user input
     private static Graph buildFromInput(String title, String newPoints, String regType, boolean connect,Component parent){
+        //Parse input into graph points
         String[] lines = newPoints.split("\\n");
         ArrayList<Point2D.Double> points = new ArrayList<>();
         for (String line:lines){
@@ -111,13 +118,14 @@ public class GraphScreen {
         }
 
         Graph graph = new Graph(title, points);
-        graph.setConnect_points(connect);
-
+        graph.setConnect_points(connect);//Connect option
+        //Determines the regression type for the graph
         switch(regType){
             case "Exponential" -> graph.setRegression(new ExponentialRegression(points));
             case "Logarithmic" -> graph.setRegression(new LogarithmicRegression(points));
             case "Logistic" -> graph.setRegression(new LogisitcRegression(points));
             case "Polynomial" -> {
+                //Prompt for polynomial order
                 String input = JOptionPane.showInputDialog("Enter the order(1-4): ");
 
                 int order = 2; //default to quadratic
