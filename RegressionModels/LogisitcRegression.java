@@ -48,7 +48,7 @@ public class LogisitcRegression extends RegressionModel {
             yFit.add(y);
         }
         //y = \frac{a}{1 + e^{-b(x - c)}}
-        function = "y = " + "\\frac{" + String.format("%.3f", a) + "}{ 1 + e^{-" + String.format("%.3f", b) + "(x - " + String.format("%.3f", c) + ")}}";
+        function = "y = " + "\\frac{" + String.format("%.3f", a) + "}{ 1 + e^{" + (b>0?"-":"") + String.format("%.3f", Math.abs(b)) + "(x " +(c>0?"-":"+")+ String.format("%.3f", Math.abs(c)) + ")}}";
         //System.out.println(function);
     }
 }
