@@ -74,7 +74,7 @@ public class MainScreen extends JPanel {
         });
     }
 
-    // NEW: Refresh the image + label-based graph cards
+    // Refresh the image + label-based graph cards
     public void refreshDisplayPanel() {
         pnlDisplay.removeAll();
 
