@@ -96,8 +96,7 @@ public class MainScreen extends JPanel {
                 JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
                 JLabel idLabel = new JLabel("ID: " + graph.getId());
                 JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
-                JLabel modelLabel = new JLabel("Model: " +
-                        (graph.getRegression() != null ? graph.getRegression().getModelName() : "None"));
+                JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
 
                 card.add(imageLabel);
                 card.add(Box.createVerticalStrut(5));
