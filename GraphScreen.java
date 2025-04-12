@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.nio.channels.NotYetBoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -74,26 +73,24 @@ public class GraphScreen {
         //Plot Button Logic
         plotButton.addActionListener(e -> {
             //Create graph from user input
-            Graph g = buildFromInput("Untitled", pointArea.getText(), (String) regressionMenu.getSelectedItem(), connectPoints.isSelected(), frame);
-            if (g != null) {
-                //Replaces current graph display with new one
-                JPanel newGraphPanel = new XChartPanel<>(drawGraph(g, frame));
-                frame.getContentPane().removeAll(); // clear old content
-                frame.add(controlPanel, BorderLayout.WEST);
-                frame.add(newGraphPanel, BorderLayout.CENTER);
-                if (g.getRegression() != null) {
-                    eqLabel.setSize(equation.getWidth(), equation.getHeight());
-                    eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                    equation.removeAll();
-                    equation.add(eqLabel);
-                    equation.add(g.getRegression().RenderEquation());
-                    equation.setVisible(true);
-                }else{
-                    equation.setVisible(false);
-                }
-                frame.revalidate();//Refreshes the layout
-                frame.repaint();//Repaints the frame
+            updateFromInput(graph, graph.getTitle(), pointArea.getText(), (String) regressionMenu.getSelectedItem(), connectPoints.isSelected(), frame);
+            //Replaces current graph display with new one
+            JPanel newGraphPanel = new XChartPanel<>(drawGraph(graph, frame));
+            frame.getContentPane().removeAll(); // clear old content
+            frame.add(controlPanel, BorderLayout.WEST);
+            frame.add(newGraphPanel, BorderLayout.CENTER);
+            if (graph.getRegression() != null) {
+                eqLabel.setSize(equation.getWidth(), equation.getHeight());
+                eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                equation.removeAll();
+                equation.add(eqLabel);
+                equation.add(graph.getRegression().RenderEquation());
+                equation.setVisible(true);
+            }else{
+                equation.setVisible(false);
             }
+            frame.revalidate();//Refreshes the layout
+            frame.repaint();//Repaints the frame
         });
         //Save Button Logic
         saveButton.addActionListener(e->{
@@ -105,28 +102,32 @@ public class GraphScreen {
                 return;
             }
             //Create graph
-            Graph g = buildFromInput(name.trim(),pointArea.getText(),(String) regressionMenu.getSelectedItem(),connectPoints.isSelected(),frame);
-
-            if (g!=null){
-                try{
-                    //handles generating a picture of the graph plot for the graph preveiw in the graph inventory manager (to be implemented)
-                    //firstly it makes an image path as files/images/graphid.png
-                    String imagePath = "files/images/" + g.getId();
-                    g.setImagePath(imagePath + ".png");
-                    save(drawGraph(graph, frame), imagePath);
-                    //Adds and saves the graph to the graph file
-                    ArrayList<Graph> graphs = GraphManager.readGraphs();
-                    graphs.add(g);
-                    GraphManager.writeGraphs(graphs);
-                    JOptionPane.showMessageDialog(frame,"Graph Saved");
-                }catch(IOException ex){
-                    JOptionPane.showMessageDialog(frame,"Error saving graph: " +ex.getMessage());
-                }
+            updateFromInput(graph, name.trim(),pointArea.getText(),(String) regressionMenu.getSelectedItem(),connectPoints.isSelected(),frame);
+            JPanel newGraphPanel = new XChartPanel<>(drawGraph(graph, frame));
+            frame.getContentPane().removeAll(); // clear old content
+            frame.add(controlPanel, BorderLayout.WEST);
+            frame.add(newGraphPanel, BorderLayout.CENTER);
+            frame.revalidate();//Refreshes the layout
+            frame.repaint();//Repaints the frame
+            try{
+                //handles generating a picture of the graph plot for the graph preveiw in the graph inventory manager (to be implemented)
+                //firstly it makes an image path as files/images/graphid.png
+                String imagePath = "files/images/" + graph.getId();
+                graph.setImagePath(imagePath + ".png");
+                save(drawGraph(graph, frame), imagePath);
+                //Adds and saves the graph to the graph file
+                ArrayList<Graph> graphs = GraphManager.readGraphs();
+                graphs.add(graph);
+                GraphManager.writeGraphs(graphs);
+                JOptionPane.showMessageDialog(frame,"Graph Saved");
+            }catch(IOException ex){
+                JOptionPane.showMessageDialog(frame,"Error saving graph: " +ex.getMessage());
             }
+
         });
     }
     //Builds a graph from user input
-    private static Graph buildFromInput(String title, String newPoints, String regType, boolean connect,Component parent){
+    private static void updateFromInput(Graph graph, String title, String newPoints, String regType, boolean connect, Component parent){
         //Parse input into graph points
         String[] lines = newPoints.split("\\n");
         ArrayList<Point2D.Double> points = new ArrayList<>();
@@ -138,11 +139,10 @@ public class GraphScreen {
                 points.add(new Point2D.Double(x,y));
             } catch(Exception e){
                 JOptionPane.showMessageDialog(parent, "Invalid point format: " + line);
-                return null;
             }
         }
-
-        Graph graph = new Graph(title, points);
+        graph.setPoints(points);
+        graph.setTitle(title);
         graph.setConnect_points(connect);//Connect option
         //Determines the regression type for the graph
         switch(regType){
@@ -166,9 +166,6 @@ public class GraphScreen {
             case "Power" -> graph.setRegression(new PowerRegression(points));
             case "Sinusoidal" -> graph.setRegression(new SinusoidalRegression(points));
         }
-
-
-        return graph;
     }
 
     private static XYChart drawGraph(Graph graph, Frame frame) {
