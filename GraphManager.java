@@ -27,7 +27,7 @@ public class GraphManager {
     // however, it is open to manage anything with the graphs later in the future
     //more than likely this class will be used to create graphs and deal with all their data though
 
-        //the demonstration code is commented out so as to not mess with jeremy's testing. demonstration code has the // comment markers on teh far left
+        //the demonstration code is commented out so as to not mess with jeremy's testing. demonstration code has the // comment markers on the far left
 
         //DEMONSTRATION OF LOADING DATA INTO THE GRAPHS.
         //we need to get this data from the user interface later
