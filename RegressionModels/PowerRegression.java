@@ -42,6 +42,6 @@ public class PowerRegression extends RegressionModel {
         }
 
         function = "y = " + String.format("%.3f", coeff[0]) + "x" + "^{" + String.format("%.3f", coeff[1]) + "}";
-        System.out.println(function);
+        //System.out.println(function);
     }
 }

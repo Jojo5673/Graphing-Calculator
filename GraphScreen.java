@@ -28,8 +28,8 @@ public class GraphScreen {
         //Control panels for input and options
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));//Gives a vertical layout
+        controlPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         controlPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));//Padding around panel
-
 
         JTextArea pointArea = new JTextArea(5,20);//Text Area for points
         JComboBox<String> regressionMenu = new JComboBox<>(new String[]{//Drop down menu for regression
@@ -42,12 +42,14 @@ public class GraphScreen {
         JButton saveButton = new JButton("Save Graph");//Button to save graph
         JPanel equation = new JPanel();
         JLabel eqLabel = new JLabel("Best Fit Equation: ");
+        eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         equation.setLayout(new BoxLayout(equation, BoxLayout.Y_AXIS));
-        equation.add(eqLabel);
-        //equation.setVisible(false);
         if (graph.getRegression() != null) {
-            equation.add(graph.getRegression().RenderEquation(equation));
+            equation.add(new JLabel("Best Fit Equation: "));
+            equation.add(graph.getRegression().RenderEquation());
             equation.setVisible(true);
+        }else{
+            equation.setVisible(false);
         }
         //Adding components to panel
         controlPanel.add(new JLabel("Points (x,y per line):"));
@@ -58,6 +60,11 @@ public class GraphScreen {
         controlPanel.add(connectPoints);
         controlPanel.add(plotButton);
         controlPanel.add(saveButton);
+        for (Component comp : controlPanel.getComponents()) {
+            if (comp instanceof JComponent) {
+                ((JComponent) comp).setAlignmentX(Component.CENTER_ALIGNMENT);
+            }
+        }
 
         //Add the control panel and regression to display frame
         frame.add(controlPanel, BorderLayout.WEST);
@@ -75,9 +82,14 @@ public class GraphScreen {
                 frame.add(controlPanel, BorderLayout.WEST);
                 frame.add(newGraphPanel, BorderLayout.CENTER);
                 if (g.getRegression() != null) {
+                    eqLabel.setSize(equation.getWidth(), equation.getHeight());
+                    eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                     equation.removeAll();
                     equation.add(eqLabel);
-                    equation.add(g.getRegression().RenderEquation(equation));
+                    equation.add(g.getRegression().RenderEquation());
+                    equation.setVisible(true);
+                }else{
+                    equation.setVisible(false);
                 }
                 frame.revalidate();//Refreshes the layout
                 frame.repaint();//Repaints the frame

@@ -31,21 +31,28 @@ public abstract class RegressionModel {
     //finally it stores an x_range to ensure that the fit points don't exceed the boundaries set for the graph plot
     public abstract void fit();
 
-    public JPanel RenderEquation(JPanel controller) {
+    public JPanel RenderEquation() {
         JLabel label = new JLabel();
         JPanel panel = new JPanel();
-        int maxWidth = 250;
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        int maxWidth = 350;
+        int idealSize = 26;
+        int size = idealSize;
 
         //renders LaTex
         TeXFormula formula = new TeXFormula(function);
-        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 26);
+        TeXIcon test_icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, idealSize);
+        if (test_icon.getIconWidth() > maxWidth){
+            size = idealSize * maxWidth/test_icon.getIconWidth();
+        }
+        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, size);
+        icon .setIconWidth(maxWidth, TeXConstants.ALIGN_TOP);
         BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         icon.paintIcon(label, image.getGraphics(), 0, 0);
 
         //adds the render to ui
         label.setIcon(icon);
         panel.add(label);
+        panel.setMaximumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
         return panel;
     }
 

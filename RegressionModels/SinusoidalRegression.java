@@ -52,6 +52,6 @@ public class SinusoidalRegression extends RegressionModel {
             yFit.add(y);
         }
         function = "y = " + String.format("%.3f", a) + "\\sin{\\left(" + String.format("%.3f", b) + "x + " + String.format("%.3f", c) + "\\right)} + " + String.format("%.3f", d);
-        System.out.println(function);
+        //System.out.println(function);
     }
 }

@@ -44,6 +44,6 @@ public class ExponentialRegression extends RegressionModel {
         }
 
         function = "y = " + String.format("%.3f", coeff[0]) + "e" + "^{" + String.format("%.3f", coeff[1]) + "x}";
-        System.out.println(function);
+        //System.out.println(function);
     }
 }

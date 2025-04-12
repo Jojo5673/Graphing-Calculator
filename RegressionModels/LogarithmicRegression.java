@@ -42,6 +42,6 @@ public class LogarithmicRegression extends RegressionModel {
         }
 
         function = "y = " + String.format("%.3f", coeff[0]) + " + " + String.format("%.3f", coeff[1]) + "\\ln{x}";
-        System.out.println(function);
+        //System.out.println(function);
     }
 }
