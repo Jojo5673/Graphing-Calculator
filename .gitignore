@@ -22,5 +22,4 @@ out/
 *.class
 
 #data file
-files/graphs.json
 files/images/*
