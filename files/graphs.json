@@ -1,0 +1,76 @@
+[
+  {
+    "id": "untitled-1744487637093",
+    "title": "Wtf?",
+    "points": [
+      {
+        "x": 2.0,
+        "y": 5.0
+      },
+      {
+        "x": 5.0,
+        "y": 6.0
+      },
+      {
+        "x": 7.0,
+        "y": 8.0
+      },
+      {
+        "x": 8.0,
+        "y": 11.0
+      }
+    ],
+    "modelName": "Sinusoidal",
+    "timeStamp": "2025-04-12T19:53:57.093137200Z",
+    "connect_points": false,
+    "imagePath": "files/images/untitled-1744487637093.png"
+  },
+  {
+    "id": "untitled-1744487784069",
+    "title": "Wtf is going on",
+    "points": [
+      {
+        "x": 2.0,
+        "y": 5.0
+      },
+      {
+        "x": 5.0,
+        "y": 6.0
+      },
+      {
+        "x": 7.0,
+        "y": 8.0
+      },
+      {
+        "x": 8.0,
+        "y": 11.0
+      }
+    ],
+    "modelName": "Quadratic",
+    "timeStamp": "2025-04-12T19:56:24.069224100Z",
+    "connect_points": false,
+    "imagePath": "files/images/untitled-1744487784069.png"
+  },
+  {
+    "id": "untitled-1744487941344",
+    "title": "Potato",
+    "points": [
+      {
+        "x": 1.0,
+        "y": 2.0
+      },
+      {
+        "x": 3.0,
+        "y": 4.0
+      },
+      {
+        "x": 5.0,
+        "y": 6.0
+      }
+    ],
+    "modelName": "Logarithmic",
+    "timeStamp": "2025-04-12T19:59:01.344860900Z",
+    "connect_points": true,
+    "imagePath": "files/images/untitled-1744487941344.png"
+  }
+]

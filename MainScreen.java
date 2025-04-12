@@ -27,7 +27,7 @@ public class MainScreen extends JPanel{
     private JPanel      pnlCommand;
     private JPanel      pnlDisplay;
     private MainScreen thisForm;
-    private  JScrollPane scrollPane;
+    private JScrollPane scrollPane;
 
     private JTable table;
     private DefaultTableModel model;

@@ -20,6 +20,3 @@ bin/
 target/
 out/
 *.class
-
-#data file
-files/images/*
