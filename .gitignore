@@ -23,4 +23,4 @@ out/
 
 #data file
 files/graphs.json
-files/images
+files/images/*

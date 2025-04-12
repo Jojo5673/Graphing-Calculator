@@ -50,8 +50,14 @@ public class SinusoidalRegression extends RegressionModel {
             double y = a * Math.sin(b * x + c) + d;
             xFit.add(x);
             yFit.add(y);
+            if (x == x_range[0]){
+                y_range[0] = y;
+            }
+            if (x + detail > x_range[1]) {
+                y_range[1] = y;
+            }
         }
         function = "y = " + String.format("%.3f", a) + "\\sin{\\left(" + String.format("%.3f", b) + "x + " + String.format("%.3f", c) + "\\right)} + " + String.format("%.3f", d);
-        System.out.println(function);
+        //System.out.println(function);
     }
 }

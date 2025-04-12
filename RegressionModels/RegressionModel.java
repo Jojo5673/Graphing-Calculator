@@ -18,12 +18,17 @@ public abstract class RegressionModel {
     protected ArrayList<Double> yFit = new ArrayList<>();
     protected WeightedObservedPoints points = new WeightedObservedPoints();
     protected double[] x_range;
+    protected double[] y_range = new double[2];
 
     public String getFunction() {return function;}
     public String getModelName() {return modelName;}
     public ArrayList<Double> getxFit() {return xFit;}
     public ArrayList<Double> getyFit() {return yFit;}
+    public double[] getY_range() {return y_range;}
 
+    public void setX_range(double min, double max) {
+        x_range = new double[]{min, max};
+    }
     //Regression model is a base class that forces its children to have a fit() method and provides a base function to render equations
     //The fit method generates a math equation for the best fit curve and provides points to plot this best fit curve
     //all regression models will have a model name and a function string that stores Latex code to render an equation in RenderEquation
@@ -34,24 +39,28 @@ public abstract class RegressionModel {
     public JPanel RenderEquation() {
         JLabel label = new JLabel();
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        int maxWidth = 350;
+        int idealSize = 26;
+        int size = idealSize;
 
         //renders LaTex
         TeXFormula formula = new TeXFormula(function);
-        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 26);
+        TeXIcon test_icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, idealSize);
+        if (test_icon.getIconWidth() > maxWidth){
+            size = idealSize * maxWidth/test_icon.getIconWidth();
+        }
+        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, size);
+        icon .setIconWidth(maxWidth, TeXConstants.ALIGN_TOP);
         BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         icon.paintIcon(label, image.getGraphics(), 0, 0);
 
         //adds the render to ui
-       label.setIcon(icon);
-       panel.add(Box.createVerticalGlue());
-       panel.add(label);
-       panel.add(Box.createVerticalGlue());
-       return panel;
+        label.setIcon(icon);
+        panel.add(label);
+        panel.setMaximumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+        return panel;
     }
 
-    public void setX_range(double min, double max) {
-        x_range = new double[]{min, max};
-    }
+
 
 }
