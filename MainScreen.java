@@ -1,22 +1,11 @@
 import javax.swing.*;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Scanner;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
-import java.io.File;
 import java.io.IOException;
-import javax.swing.table.*;
-import javax.swing.table.DefaultTableModel;
-import java.util.Comparator;
-import java.util.Collections;
-import java.awt.Color;
 
-public class MainScreen extends JPanel{
-    //button declarations
+public class MainScreen extends JPanel {
+    // Buttons
     private JButton cmdAddGraph;
     private JButton cmdEditGraph;
     private JButton cmdDeleteGraph;
@@ -24,42 +13,25 @@ public class MainScreen extends JPanel{
     private JButton cmdSortTitle;
     private JButton cmdSortModel;
 
-    private JPanel      pnlCommand;
-    private JPanel      pnlDisplay;
+    private JPanel pnlCommand;
+    private JPanel pnlDisplay;
     private MainScreen thisForm;
-    private JScrollPane scrollPane;
-
-    private JTable table;
-    private DefaultTableModel model;
 
     private ArrayList<Graph> glist = new ArrayList<>();
 
-    //constructor for MainScreen
+    // Constructor
     public MainScreen() {
-        super(new GridLayout(2,1));
+        super(new BorderLayout());
         thisForm = this;
 
         pnlCommand = new JPanel();
         pnlDisplay = new JPanel();
+        pnlDisplay.setLayout(new GridLayout(0, 2, 10, 10)); // Display 2 graph cards per row
 
-        //smthn for glist
-        String[] columnNames = {"ID", "Title", "Time Created", "Regression Model"};
-        model = new DefaultTableModel(columnNames, 0);
-        table = new JTable(model);
-        //showtable
+        JScrollPane scrollPane = new JScrollPane(pnlDisplay);
+        add(scrollPane, BorderLayout.CENTER);
 
-        table.setPreferredScrollableViewportSize(new Dimension(500, glist.size()*15 +50));
-        table.setFillsViewportHeight(true);
-
-       // table.setBackground(new Color(240, 255, 255)); // Light cyan table background
-      //  table.setGridColor(Color.BLACK);
-        //table.setSelectionBackground(new Color(0,128,128)); //teal highlight colour
-
-        scrollPane = new JScrollPane(table);
-
-        add(scrollPane);
-
-        //text fields for buttons
+        // Buttons
         cmdAddGraph = new JButton("Add Graph");
         cmdEditGraph = new JButton("Edit Graph");
         cmdDeleteGraph = new JButton("Delete Graph");
@@ -67,17 +39,19 @@ public class MainScreen extends JPanel{
         cmdSortTitle = new JButton("Sort by Title");
         cmdSortModel = new JButton("Sort by Model");
 
-        cmdClose.addActionListener(new CloseButtonListener());
-       // cmdAddGraph.addActionListener(new AddGraphButtonListener());
-        cmdAddGraph.addActionListener(e -> new GraphScreen(thisForm));
+        // Button Listeners
+        cmdAddGraph.addActionListener(e -> {
+            new GraphScreen(thisForm);
+            refreshDisplayPanel();
+        });
         cmdEditGraph.addActionListener(new EditGraphListener());
         cmdDeleteGraph.addActionListener(new DeleteGraphListener());
         cmdSortTitle.addActionListener(new SortTitleListener());
         cmdSortModel.addActionListener(new SortModelListener());
+        cmdClose.addActionListener(e -> System.exit(0));
+        cmdClose.setBackground(new Color(255, 199, 206)); // Light red for Close
 
-
-        cmdClose.setBackground(new Color(255,199,206)); //sets close to a light red colour
-
+        // Add buttons to panel
         pnlCommand.add(cmdAddGraph);
         pnlCommand.add(cmdEditGraph);
         pnlCommand.add(cmdDeleteGraph);
@@ -85,119 +59,85 @@ public class MainScreen extends JPanel{
         pnlCommand.add(cmdSortModel);
         pnlCommand.add(cmdClose);
 
-        add(pnlCommand);
-    }
+        add(pnlCommand, BorderLayout.SOUTH);
 
-    private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Graph Information");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Create and set up the content pane.
-        MainScreen newContentPane = new MainScreen();
-        newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
+        refreshDisplayPanel(); // Load graphs on startup
     }
 
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Graph Information");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(new MainScreen());
+            frame.pack();
+            frame.setVisible(true);
         });
     }
 
-    public void refreshTable() {
+    // NEW: Refresh the image + label-based graph cards
+    public void refreshDisplayPanel() {
+        pnlDisplay.removeAll();
+
         try {
-            glist = GraphManager.readGraphs(); // Load updated graph list
-            model.setRowCount(0); // Clear existing table rows
+            glist = GraphManager.readGraphs();
 
             for (Graph graph : glist) {
-                String modelName = graph.getRegression() != null ? graph.getRegression().getModelName() : "None";
-                model.addRow(new Object[]{
-                        graph.getId(),
-                        graph.getTitle(),
-                        graph.getTimeStamp(),
-                        modelName
-                });
-            }
-            table.setPreferredScrollableViewportSize(new Dimension(500, glist.size()*15 +50));
-            table.revalidate();
-            table.repaint();
+                JPanel card = new JPanel();
+                card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+                card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+                card.setBackground(new Color(245, 245, 245));
+                card.setPreferredSize(new Dimension(250, 250));
 
+                JLabel imageLabel = new JLabel();
+                ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
+                Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
+                imageLabel.setIcon(new ImageIcon(img));
+
+                JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
+                JLabel idLabel = new JLabel("ID: " + graph.getId());
+                JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
+                JLabel modelLabel = new JLabel("Model: " +
+                        (graph.getRegression() != null ? graph.getRegression().getModelName() : "None"));
+
+                card.add(imageLabel);
+                card.add(Box.createVerticalStrut(5));
+                card.add(titleLabel);
+                card.add(idLabel);
+                card.add(timeLabel);
+                card.add(modelLabel);
+
+                pnlDisplay.add(card);
+            }
+
+            pnlDisplay.revalidate();
+            pnlDisplay.repaint();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Failed to load graphs: " + ex.getMessage());
         }
     }
 
-    private static class CloseButtonListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            System.exit(0);
-        }
-
-    }
-
-    private class AddGraphButtonListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            new GraphScreen(thisForm);
+    // Placeholder listeners
+    private static class EditGraphListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // TODO: Implement Edit
         }
     }
 
-    private static class EditGraphListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            //new GraphManager();
+    private static class DeleteGraphListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // TODO: Implement Delete
         }
     }
 
-    private static class DeleteGraphListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            //new GraphManager();
+    private static class SortTitleListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // TODO: Sort by title
         }
     }
 
-    private static class SortTitleListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-
-           // Collections.sort(plist, Comparator.comparingInt(Person::getAge));
-
-            //resets table
-           // model.setRowCount(0);
-
-            //populates table
-           // showTable(plist);
+    private static class SortModelListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // TODO: Sort by model
         }
     }
-
-    private static class SortModelListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-
-            // Collections.sort(plist, Comparator.comparingInt(Person::getAge));
-
-            //resets table
-            // model.setRowCount(0);
-
-            //populates table
-            // showTable(plist);
-        }
-    }
-
-
-
 }
-
-

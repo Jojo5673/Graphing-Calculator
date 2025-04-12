@@ -133,7 +133,7 @@ public class GraphScreen {
 
                 //refreshes table
                 if (this.mscreen != null) {
-                   this.mscreen.refreshTable();
+                   this.mscreen.refreshDisplayPanel();
                 }
 
                 JOptionPane.showMessageDialog(frame,"Graph Saved");
