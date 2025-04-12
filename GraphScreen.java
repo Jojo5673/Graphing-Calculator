@@ -14,6 +14,16 @@ import java.util.Map;
 import RegressionModels.*;
 
 public class GraphScreen {
+    private MainScreen mscreen; //instance of main screen
+    private GraphScreen gscreen;
+
+    public GraphScreen(MainScreen mscreen) {
+        this.mscreen = mscreen;
+        Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
+        plot(emptyGraph);
+    }
+
+
     public static void plot(Graph graph) {
         JFrame frame = new JFrame("Graph");
         //makes the frame for the graph manager

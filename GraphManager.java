@@ -20,7 +20,7 @@ public class GraphManager {
     public static String JsonfilePath = "files/graphs.json";
     //keeps the data file's path for access anywhere
 
-    public static void main(String[] args) {
+   // public static void main(String[] args) {
     //everything here right now is just for testing
     //its likely this class won't even be the class with the main function but below is just a demonstration of how things should work
     //the entire purpose of this class right now is to hold readGraphs and WriteGraphs methods
@@ -31,7 +31,8 @@ public class GraphManager {
 
         //DEMONSTRATION OF LOADING DATA INTO THE GRAPHS.
         //we need to get this data from the user interface later
-        ArrayList<Point2D.Double> data = new ArrayList<>();
+//ArrayList<Point2D.Double> data = new ArrayList<>();
+
 //        data.add(new Point2D.Double(1, 5));
 //        data.add(new Point2D.Double(2, 3));
 //        data.add(new Point2D.Double(3, 5));
@@ -49,12 +50,13 @@ public class GraphManager {
         // Their data needs to be initialised and packed into an arraylist of points
         // The must be constructed with a title and said data
         // the setREgression and setConnect_points will be utilised in the Graph Screen when the user is editing the graphs
-        Graph graph = new Graph("Test Graph", data);
+     //   Graph graph = new Graph("Test Graph", data);
 //        Graph graph2 = new Graph("Test Graph2", data2);
 //        graph2.setRegression(new PolynomialRegression(data2, 2));
 //        graph.setConnect_points(true);
 //        graph.setRegression(new PolynomialRegression(data, 1));
-        GraphScreen.plot(graph);
+
+      //  GraphScreen.plot(graph);
 
         //DEMONSTRATION OF FILE READ/WRITE WITH GRAPHS
         //they are written by passing an arraylist of any amount of graphs to writeGraphs()
@@ -76,7 +78,7 @@ public class GraphManager {
 //            for (Graph g : readGraphs())
 //                GraphScreen.plot(g); //this is the function to display graphs by the way
 //        }catch (IOException e){System.out.println("Unable to read to file");}
-    }
+   // }
 
     //it's important to clarify why all this has been done to store the file in a json
     //json stores key value pairs kind of like a hashmap or dictionary
