@@ -18,12 +18,17 @@ public abstract class RegressionModel {
     protected ArrayList<Double> yFit = new ArrayList<>();
     protected WeightedObservedPoints points = new WeightedObservedPoints();
     protected double[] x_range;
+    protected double[] y_range = new double[2];
 
     public String getFunction() {return function;}
     public String getModelName() {return modelName;}
     public ArrayList<Double> getxFit() {return xFit;}
     public ArrayList<Double> getyFit() {return yFit;}
+    public double[] getY_range() {return y_range;}
 
+    public void setX_range(double min, double max) {
+        x_range = new double[]{min, max};
+    }
     //Regression model is a base class that forces its children to have a fit() method and provides a base function to render equations
     //The fit method generates a math equation for the best fit curve and provides points to plot this best fit curve
     //all regression models will have a model name and a function string that stores Latex code to render an equation in RenderEquation
@@ -56,8 +61,6 @@ public abstract class RegressionModel {
         return panel;
     }
 
-    public void setX_range(double min, double max) {
-        x_range = new double[]{min, max};
-    }
+
 
 }

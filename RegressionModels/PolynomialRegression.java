@@ -55,6 +55,12 @@ public class PolynomialRegression extends RegressionModel {
             }
             xFit.add(x);
             yFit.add(y);
+            if (x == x_range[0]){
+                y_range[0] = y;
+            }
+            if (x + detail > x_range[1]) {
+                y_range[1] = y;
+            }
         }
     }
 

@@ -46,6 +46,12 @@ public class LogisitcRegression extends RegressionModel {
             double y = a / (1 + Math.exp(-b * (x - c)));
             xFit.add(x);
             yFit.add(y);
+            if (x == x_range[0]){
+                y_range[0] = y;
+            }
+            if (x + detail > x_range[1]) {
+                y_range[1] = y;
+            }
         }
         //y = \frac{a}{1 + e^{-b(x - c)}}
         function = "y = " + "\\frac{" + String.format("%.3f", a) + "}{ 1 + e^{" + (b>0?"-":"") + String.format("%.3f", Math.abs(b)) + "(x " +(c>0?"-":"+")+ String.format("%.3f", Math.abs(c)) + ")}}";

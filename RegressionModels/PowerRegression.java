@@ -39,6 +39,12 @@ public class PowerRegression extends RegressionModel {
             double y = coeff[0] * Math.pow(x, coeff[1]);
             xFit.add(x);
             yFit.add(y);
+            if (x == x_range[0]){
+                y_range[0] = y;
+            }
+            if (x + detail > x_range[1]) {
+                y_range[1] = y;
+            }
         }
 
         function = "y = " + String.format("%.3f", coeff[0]) + "x" + "^{" + String.format("%.3f", coeff[1]) + "}";

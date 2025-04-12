@@ -39,6 +39,12 @@ public class ExponentialRegression extends RegressionModel {
         double[] coeff = fitter.fit(points.toList());
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] * Math.exp(x * coeff[1]);
+            if (x == x_range[0]){
+                y_range[0] = y;
+            }
+            if (x + detail > x_range[1]) {
+                y_range[1] = y;
+            }
             xFit.add(x);
             yFit.add(y);
         }
