@@ -1,7 +1,4 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -12,7 +9,6 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.JButton;
 import javax.swing.table.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.Comparator;
@@ -72,7 +68,8 @@ public class MainScreen extends JPanel{
         cmdSortModel = new JButton("Sort by Model");
 
         cmdClose.addActionListener(new CloseButtonListener());
-        cmdAddGraph.addActionListener(new AddGraphButtonListener());
+       // cmdAddGraph.addActionListener(new AddGraphButtonListener());
+        cmdAddGraph.addActionListener(e -> new GraphScreen(thisForm));
         cmdEditGraph.addActionListener(new EditGraphListener());
         cmdDeleteGraph.addActionListener(new DeleteGraphListener());
         cmdSortTitle.addActionListener(new SortTitleListener());
@@ -111,6 +108,29 @@ public class MainScreen extends JPanel{
                 createAndShowGUI();
             }
         });
+    }
+
+    public void refreshTable() {
+        try {
+            glist = GraphManager.readGraphs(); // Load updated graph list
+            model.setRowCount(0); // Clear existing table rows
+
+            for (Graph graph : glist) {
+                String modelName = graph.getRegression() != null ? graph.getRegression().getModelName() : "None";
+                model.addRow(new Object[]{
+                        graph.getId(),
+                        graph.getTitle(),
+                        graph.getTimeStamp(),
+                        modelName
+                });
+            }
+            table.setPreferredScrollableViewportSize(new Dimension(500, glist.size()*15 +50));
+            table.revalidate();
+            table.repaint();
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Failed to load graphs: " + ex.getMessage());
+        }
     }
 
     private static class CloseButtonListener implements ActionListener

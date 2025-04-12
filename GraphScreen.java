@@ -24,7 +24,7 @@ public class GraphScreen {
     }
 
 
-    public static void plot(Graph graph) {
+    public void plot(Graph graph) {
         JFrame frame = new JFrame("Graph");
         //makes the frame for the graph manager
 
@@ -130,6 +130,12 @@ public class GraphScreen {
                 ArrayList<Graph> graphs = GraphManager.readGraphs();
                 graphs.add(graph);
                 GraphManager.writeGraphs(graphs);
+
+                //refreshes table
+                if (this.mscreen != null) {
+                   this.mscreen.refreshTable();
+                }
+
                 JOptionPane.showMessageDialog(frame,"Graph Saved");
             }catch(IOException ex){
                 JOptionPane.showMessageDialog(frame,"Error saving graph: " +ex.getMessage());
