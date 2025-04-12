@@ -20,7 +20,7 @@ public class GraphScreen {
 
         //displays chart window with equation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+        frame.setSize(1280, 720);
         //adds the graph panel
         frame.add(new XChartPanel<>(drawGraph(graph, frame)), BorderLayout.CENTER);
         //adds the equation panel is there is a regression stored for the graph
@@ -40,9 +40,19 @@ public class GraphScreen {
         JCheckBox connectPoints = new JCheckBox("Connect Points");//Checkbox for connecting points
         JButton plotButton = new JButton("Plot Graph");//Button to plot graph
         JButton saveButton = new JButton("Save Graph");//Button to save graph
+        JPanel equation = new JPanel();
+        JLabel eqLabel = new JLabel("Best Fit Equation: ");
+        equation.setLayout(new BoxLayout(equation, BoxLayout.Y_AXIS));
+        equation.add(eqLabel);
+        //equation.setVisible(false);
+        if (graph.getRegression() != null) {
+            equation.add(graph.getRegression().RenderEquation(equation));
+            equation.setVisible(true);
+        }
         //Adding components to panel
         controlPanel.add(new JLabel("Points (x,y per line):"));
         controlPanel.add(new JScrollPane(pointArea));
+        controlPanel.add(equation);
         controlPanel.add(new JLabel("Regression Type:"));
         controlPanel.add(regressionMenu);
         controlPanel.add(connectPoints);
@@ -51,8 +61,6 @@ public class GraphScreen {
 
         //Add the control panel and regression to display frame
         frame.add(controlPanel, BorderLayout.WEST);
-        if (graph.getRegression() != null)
-            frame.add(graph.getRegression().RenderEquation(), BorderLayout.EAST);//Add updated equation panel
         frame.pack();
         frame.setVisible(true);
 
@@ -67,7 +75,9 @@ public class GraphScreen {
                 frame.add(controlPanel, BorderLayout.WEST);
                 frame.add(newGraphPanel, BorderLayout.CENTER);
                 if (g.getRegression() != null) {
-                    frame.add(g.getRegression().RenderEquation(), BorderLayout.EAST);
+                    equation.removeAll();
+                    equation.add(eqLabel);
+                    equation.add(g.getRegression().RenderEquation(equation));
                 }
                 frame.revalidate();//Refreshes the layout
                 frame.repaint();//Repaints the frame

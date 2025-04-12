@@ -31,9 +31,10 @@ public abstract class RegressionModel {
     //finally it stores an x_range to ensure that the fit points don't exceed the boundaries set for the graph plot
     public abstract void fit();
 
-    public JPanel RenderEquation() {
+    public JPanel RenderEquation(JPanel controller) {
         JLabel label = new JLabel();
         JPanel panel = new JPanel();
+        int maxWidth = 250;
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         //renders LaTex
@@ -43,11 +44,9 @@ public abstract class RegressionModel {
         icon.paintIcon(label, image.getGraphics(), 0, 0);
 
         //adds the render to ui
-       label.setIcon(icon);
-       panel.add(Box.createVerticalGlue());
-       panel.add(label);
-       panel.add(Box.createVerticalGlue());
-       return panel;
+        label.setIcon(icon);
+        panel.add(label);
+        return panel;
     }
 
     public void setX_range(double min, double max) {
