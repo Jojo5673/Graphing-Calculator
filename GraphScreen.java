@@ -54,7 +54,7 @@ public class GraphScreen {
         JLabel eqLabel = new JLabel("Best Fit Equation: ");
         eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         equation.setLayout(new BoxLayout(equation, BoxLayout.Y_AXIS));
-        if (graph.getRegression() != null) {
+        if (!Objects.equals(graph.getRegression().getModelName(), "None")) {
             equation.add(new JLabel("Best Fit Equation: "));
             equation.add(graph.getRegression().RenderEquation());
             equation.setVisible(true);
@@ -90,7 +90,7 @@ public class GraphScreen {
             frame.getContentPane().removeAll(); // clear old content
             frame.add(controlPanel, BorderLayout.WEST);
             frame.add(newGraphPanel, BorderLayout.CENTER);
-            if (graph.getRegression() != null) {
+            if (!Objects.equals(graph.getRegression().getModelName(), "None")){
                 eqLabel.setSize(equation.getWidth(), equation.getHeight());
                 eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 equation.removeAll();
@@ -163,6 +163,7 @@ public class GraphScreen {
         graph.setConnect_points(connect);//Connect option
         //Determines the regression type for the graph
         switch(regType){
+            case "None" -> graph.setRegression(new None());
             case "Exponential" -> graph.setRegression(new ExponentialRegression(points));
             case "Logarithmic" -> graph.setRegression(new LogarithmicRegression(points));
             case "Logistic" -> graph.setRegression(new LogisitcRegression(points));
@@ -231,7 +232,7 @@ public class GraphScreen {
 
             //plots points and connects dots if necessary as shown by the ternary operator in setLineStyle()
             chart.addSeries("Data Points", x_data, y_data).setMarker(SeriesMarkers.CIRCLE).setLineStyle(graph.isConnect_points()?SeriesLines.SOLID:SeriesLines.NONE).setShowInLegend(false);
-            if (regression != null) {
+            if (!Objects.equals(regression.getModelName(), "None")) {
                 //the graphing library (xChart) doesnt allow continuous lines so the regression model needs to generate points along its curve line
                 //these points are plotted and connected by the charting library
                 regression.setX_range(min_padded.getX(), max_padded.getX()); //this passes the plot area to the regression

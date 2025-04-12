@@ -9,7 +9,7 @@ public class Graph {
     private String id; //unique hash generated to help with searching
     private String title;
     private ArrayList<Point2D.Double> points;
-    private transient RegressionModel regression = null;   //marked transient to avoid showing up in json file (unable to store regression models)
+    private transient RegressionModel regression;   //marked transient to avoid showing up in json file (unable to store regression models)
     private String modelName = "";
     private Instant timeStamp; //stores the instant that the graph was created to help with sorting
     private Boolean connect_points = false; //used to determine whether to connect the points when rendering the graph
@@ -43,6 +43,7 @@ public class Graph {
     public Graph(String title, ArrayList<Point2D.Double> points) {
         this.title = title;
         this.points = points;
+        regression = new None();
         GenerateID();
         this.timeStamp = Instant.now();
     }
@@ -59,6 +60,9 @@ public class Graph {
     //used for when the graph is being loaded from storage since we cant store the regression classes in the file
     public void LoadRegression() {
         switch (modelName) {
+            case "None":
+                regression = new None();
+                break;
             case "Sinusoidal":
                 regression = new SinusoidalRegression(points);
                 break;
