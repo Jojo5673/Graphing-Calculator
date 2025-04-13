@@ -52,6 +52,9 @@ public class LogisitcRegression extends RegressionModel {
             if (y > y_range[1]) {
                 y_range[1] = y;
             }
+            if (y < y_limits[0] || y > y_limits[1]) {
+                break;
+            }
         }
         //y = \frac{a}{1 + e^{-b(x - c)}}
         function = "y = " + "\\frac{" + String.format("%.3f", a) + "}{ 1 + e^{" + (b>0?"-":"") + String.format("%.3f", Math.abs(b)) + "(x " +(c>0?"-":"+")+ String.format("%.3f", Math.abs(c)) + ")}}";

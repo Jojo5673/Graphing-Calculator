@@ -60,6 +60,9 @@ public class PolynomialRegression extends RegressionModel {
             if (y > y_range[1]) {
                 y_range[1] = y;
             }
+            if (y < y_limits[0] || y > y_limits[1]) {
+                break;
+            }
         }
     }
 

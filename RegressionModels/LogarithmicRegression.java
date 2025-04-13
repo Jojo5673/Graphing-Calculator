@@ -48,6 +48,9 @@ public class LogarithmicRegression extends RegressionModel {
             if (y > y_range[1]) {
                 y_range[1] = y;
             }
+            if (y < y_limits[0] || y > y_limits[1]) {
+                break;
+            }
         }
 
         function = "y = " + String.format("%.3f", coeff[0]) + " + " + String.format("%.3f", coeff[1]) + "\\ln{x}";

@@ -244,6 +244,9 @@ public class GraphScreen {
             if (x > max_axis.getX())
                 max_axis.setLocation(x, max_axis.getY());
         }
+        //a max range is set that is 6x the range of the data points (3x above and below). these are the boundaries for the autoscaling
+        double max_range = max_axis.getY() - min_axis.getY() * 3;
+        double[] maxY_fit = {min_axis.getY() - max_range, max_axis.getY() + max_range};
         //calculates padding by applying the padding % to the width of the points spread
         double x_pad = padding * (max_axis.getX() - min_axis.getX());
         double y_pad = padding * (max_axis.getY() - min_axis.getY());
@@ -265,6 +268,7 @@ public class GraphScreen {
                 //the graphing library (xChart) doesnt allow continuous lines so the regression model needs to generate points along its curve line
                 //these points are plotted and connected by the charting library
                 regression.setX_range(min_padded.getX(), max_padded.getX()); //this passes the plot area to the regression
+                regression.setY_limits(maxY_fit);
                 //this allows it to know where it needs to generate points for
                 try {
                     regression.fit();
