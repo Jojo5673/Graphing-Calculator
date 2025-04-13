@@ -140,11 +140,52 @@ public class MainScreen extends JPanel {
         }
     }
 
-    private static class DeleteGraphListener implements ActionListener {
+    private class DeleteGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            // TODO: Implement Delete
+            String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to delete:");
+
+            if (inputId == null || inputId.trim().isEmpty()) {
+                return;
+            }
+
+            try {
+                ArrayList<Graph> allGraphs = GraphManager.readGraphs();
+                boolean found = false;
+
+                for (int i = 0; i < allGraphs.size(); i++) {
+                    Graph g = allGraphs.get(i);
+                    if (g.getId().equals(inputId.trim())) {
+                        int confirm = JOptionPane.showConfirmDialog(thisForm,
+                                "Are you sure you want to delete the graph titled \"" + g.getTitle() + "\"?",
+                                "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            allGraphs.remove(i);
+                            // Try deleting associated image file if it exists
+                            if (g.getImagePath() != null) {
+                                java.io.File imageFile = new java.io.File(g.getImagePath());
+                                if (imageFile.exists()) {
+                                    imageFile.delete();
+                                }
+                            }
+                            GraphManager.writeGraphs(allGraphs);
+                            thisForm.refreshDisplayPanel();
+                            JOptionPane.showMessageDialog(thisForm, "Graph deleted.");
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    JOptionPane.showMessageDialog(thisForm, "Graph ID not found.");
+                }
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(thisForm, "Error deleting graph: " + ex.getMessage());
+            }
         }
     }
+
 
     private static class SortTitleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
