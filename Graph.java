@@ -63,9 +63,6 @@ public class Graph {
             case "None":
                 regression = new None();
                 break;
-            case "Sinusoidal":
-                regression = new SinusoidalRegression(points);
-                break;
             case "Linear":
                 regression = new PolynomialRegression(points, 1);
                 break;
