@@ -98,7 +98,7 @@ public class MainScreen extends JPanel {
             card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
             card.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.GRAY, 1),
-                    BorderFactory.createEmptyBorder(10, 10, 10, 10) // top, left, bottom, right padding
+                    BorderFactory.createEmptyBorder(0, 10, 10, 10) // top, left, bottom, right padding
             ));
             card.setBackground(new Color(245, 245, 245));
             card.setPreferredSize(new Dimension(250, 250));
@@ -118,6 +118,56 @@ public class MainScreen extends JPanel {
             JLabel timeLabel = new JLabel("Created: " + formatted);
             JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
 
+            JPanel topPanel = new JPanel(new BorderLayout());
+            topPanel.setOpaque(false); // so it blends with the card
+
+            JButton deleteItem = new JButton("×");
+            deleteItem.setFont(new Font("Arial", Font.BOLD, 16));
+            deleteItem.setMargin(new Insets(0, 0, 0, 0));
+            deleteItem.setFocusPainted(false);
+            deleteItem.setBorderPainted(false);
+            deleteItem.setContentAreaFilled(false);
+            deleteItem.setForeground(Color.RED);
+            deleteItem.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            deleteItem.setMaximumSize(new Dimension(20, 20));
+
+            // deleting listener
+            deleteItem.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(thisForm,
+                        "Are you sure you want to delete the graph titled \"" + graph.getTitle() + "\"?",
+                        "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    glist.remove(graph);
+                    // Try deleting associated image file if it exists
+                    if (graph.getImagePath() != null) {
+                        java.io.File imageFile = new java.io.File(graph.getImagePath());
+                        if (imageFile.exists()) {
+                            imageFile.delete();
+                        }
+                    }
+                    try{
+                        GraphManager.writeGraphs(glist);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(thisForm, "Error deleting graph: " + ex.getMessage());
+                    }
+                    thisForm.refreshDisplayPanel();
+                    JOptionPane.showMessageDialog(thisForm, "Graph deleted.");
+
+                    pnlDisplay.remove(card); // Remove from UI
+                    pnlDisplay.revalidate();
+                    pnlDisplay.repaint();
+                    pnlDisplay.remove(card); // Remove from UI
+                    pnlDisplay.revalidate();
+                    pnlDisplay.repaint();
+                }
+            });
+
+            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+            topPanel.add(Box.createHorizontalGlue());
+            topPanel.add(deleteItem);
+            deleteItem.setAlignmentY(Component.CENTER_ALIGNMENT);
+            deleteItem.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            card.add(topPanel);
             card.add(imageLabel);
             card.add(Box.createVerticalStrut(5));
             card.add(titleLabel);
@@ -130,7 +180,7 @@ public class MainScreen extends JPanel {
               //  @Override
                 public void mouseClicked(MouseEvent e) {
                     try {
-                        openGraphForEditing(graph); // allows graph to be edited (without searching for ID)
+                        openGraphForEditing(graph);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -149,7 +199,6 @@ public class MainScreen extends JPanel {
                 }
             });
 
-
             for (Component comp : card.getComponents()) {
                 if (comp instanceof JComponent) {
                     ((JComponent) comp).setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -157,7 +206,6 @@ public class MainScreen extends JPanel {
             }
             pnlDisplay.add(card);
         }
-
 
         pnlDisplay.revalidate();
         pnlDisplay.repaint();
