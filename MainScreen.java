@@ -11,7 +11,7 @@ public class MainScreen extends JPanel {
     private JButton cmdDeleteGraph;
     private JButton cmdClose;
     private JButton cmdSortTitle;
-    private JButton cmdSortID;
+    private JButton cmdSortTime;
 
     private JPanel pnlCommand;
     private JPanel pnlDisplay;
@@ -37,7 +37,7 @@ public class MainScreen extends JPanel {
         cmdDeleteGraph = new JButton("Delete Graph");
         cmdClose = new JButton("Close");
         cmdSortTitle = new JButton("Sort by Title");
-        cmdSortID = new JButton("Sort by ID");
+        cmdSortTime = new JButton("Sort by Time Created");
 
         // Button Listeners
         cmdAddGraph.addActionListener(e -> {
@@ -47,7 +47,7 @@ public class MainScreen extends JPanel {
         cmdEditGraph.addActionListener(new EditGraphListener());
         cmdDeleteGraph.addActionListener(new DeleteGraphListener());
         cmdSortTitle.addActionListener(new SortTitleListener());
-        cmdSortID.addActionListener(new SortIDListener());
+        cmdSortTime.addActionListener(new SortTimeListener());
         cmdClose.addActionListener(e -> System.exit(0));
         cmdClose.setBackground(new Color(255, 199, 206)); // Light red for Close
 
@@ -56,7 +56,7 @@ public class MainScreen extends JPanel {
         pnlCommand.add(cmdEditGraph);
         pnlCommand.add(cmdDeleteGraph);
         pnlCommand.add(cmdSortTitle);
-        pnlCommand.add(cmdSortID);
+        pnlCommand.add(cmdSortTime);
         pnlCommand.add(cmdClose);
 
         add(pnlCommand, BorderLayout.SOUTH);
@@ -232,9 +232,82 @@ public class MainScreen extends JPanel {
         }
     }
 
-    private static class SortIDListener implements ActionListener {
+    private class SortTimeListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            // TODO: Sort by model
+            // Create radio buttons for the options
+            JRadioButton rbtnNewestToOldest = new JRadioButton("Newest to Oldest");
+            JRadioButton rbtnOldestToNewest = new JRadioButton("Oldest to Newest");
+
+            // Group the radio buttons so only one can be selected at a time
+            ButtonGroup group = new ButtonGroup();
+            group.add(rbtnNewestToOldest);
+            group.add(rbtnOldestToNewest);
+
+            // Create a panel to hold the radio buttons
+            JPanel panel = new JPanel();
+            panel.add(rbtnNewestToOldest);
+            panel.add(rbtnOldestToNewest);
+
+            // Show the option dialog
+            int option = JOptionPane.showConfirmDialog(
+                    thisForm,
+                    panel,
+                    "Please choose sort option: ",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            // If the user presses "OK", perform sorting based on selected option
+            if (option == JOptionPane.OK_OPTION) {
+                try {
+                    glist = GraphManager.readGraphs();
+
+                    // Sort based on selected radio button
+                    if (rbtnNewestToOldest.isSelected()) {
+                        // Newest to Oldest
+                        glist.sort((g1, g2) -> g2.getTimeStamp().compareTo(g1.getTimeStamp()));
+                    } else if (rbtnOldestToNewest.isSelected()) {
+                        // Oldest to Newest
+                        glist.sort((g1, g2) -> g1.getTimeStamp().compareTo(g2.getTimeStamp()));
+                    }
+
+                    // Refresh the display with sorted list
+                    pnlDisplay.removeAll();
+                    for (Graph graph : glist) {
+                        JPanel card = new JPanel();
+                        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+                        card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+                        card.setBackground(new Color(245, 245, 245));
+                        card.setPreferredSize(new Dimension(250, 250));
+
+                        JLabel imageLabel = new JLabel();
+                        ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
+                        Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
+                        imageLabel.setIcon(new ImageIcon(img));
+
+                        JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
+                        JLabel idLabel = new JLabel("ID: " + graph.getId());
+                        JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
+                        JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
+
+                        card.add(imageLabel);
+                        card.add(Box.createVerticalStrut(5));
+                        card.add(titleLabel);
+                        card.add(idLabel);
+                        card.add(timeLabel);
+                        card.add(modelLabel);
+
+                        pnlDisplay.add(card);
+                    }
+
+                    pnlDisplay.revalidate();
+                    pnlDisplay.repaint();
+
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(thisForm, "Error sorting by time: " + ex.getMessage());
+                }
+            }
         }
     }
+
 }
