@@ -19,17 +19,14 @@ public class GraphScreen {
 
     public GraphScreen(MainScreen mscreen, Graph graphToEdit) {
         this.mscreen = mscreen;
-       // Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
-      //  plot(emptyGraph);
         plot(graphToEdit != null ? graphToEdit : new Graph("Untitled", new ArrayList<>()));
     }
 
-    //alternate constructor
+    //alternate constructor for GraphScreen
     public GraphScreen(MainScreen mscreen) {
         this.mscreen = mscreen;
         Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
         plot(emptyGraph);
-        //plot(graphToEdit != null ? graphToEdit : new Graph("Untitled", new ArrayList<>()));
     }
 
 

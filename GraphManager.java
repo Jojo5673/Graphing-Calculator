@@ -149,14 +149,14 @@ public class GraphManager {
 
     //used to get existing graphIDs
     public static Set<String> getExistingGraphIds() {
-        Set<String> idSet = new HashSet<>();
+        Set<String> idSet = new HashSet<>(); //using a hash set to store ids
         try {
             ArrayList<Graph> glist = readGraphs();
             for (Graph graph : glist) {
                 idSet.add(graph.getId());
             }
-        } catch (IOException e) {
-            e.printStackTrace(); // or handle more gracefully
+        } catch (IOException e) { //catches exception
+            e.printStackTrace();
         }
         return idSet;
     }

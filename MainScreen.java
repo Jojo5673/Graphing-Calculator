@@ -13,13 +13,14 @@ public class MainScreen extends JPanel {
     private JButton cmdSortTitle;
     private JButton cmdSortTime;
 
+    //Panel declarations
     private JPanel pnlCommand;
     private JPanel pnlDisplay;
     private MainScreen thisForm;
 
     private ArrayList<Graph> glist = new ArrayList<>();
 
-    // Constructor
+    // Constructor for Main Screen
     public MainScreen() {
         super(new BorderLayout());
         thisForm = this;
@@ -28,6 +29,7 @@ public class MainScreen extends JPanel {
         pnlDisplay = new JPanel();
         pnlDisplay.setLayout(new GridLayout(0, 2, 10, 10)); // Display 2 graph cards per row
 
+        //Adds scroll pane
         JScrollPane scrollPane = new JScrollPane(pnlDisplay);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -37,7 +39,7 @@ public class MainScreen extends JPanel {
         cmdDeleteGraph = new JButton("Delete Graph");
         cmdClose = new JButton("Close");
         cmdSortTitle = new JButton("Sort by Title");
-        cmdSortTime = new JButton("Sort by Time Created");
+        cmdSortTime = new JButton("Sort by Time");
 
         // Button Listeners
         cmdAddGraph.addActionListener(e -> {
@@ -64,6 +66,7 @@ public class MainScreen extends JPanel {
         refreshDisplayPanel(); // Load graphs on startup
     }
 
+    //Main declaration
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Graph Information");
@@ -116,10 +119,11 @@ public class MainScreen extends JPanel {
         }
     }
 
-    // Placeholder listeners
+   //Listeners
     private class EditGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to edit:");
+            //checks that ID is not null
             if (inputId == null || inputId.trim().isEmpty()) {
                 return;
             }
@@ -140,6 +144,7 @@ public class MainScreen extends JPanel {
         }
     }
 
+    //Listener for delete graph
     private class DeleteGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to delete:");
@@ -152,6 +157,7 @@ public class MainScreen extends JPanel {
                 ArrayList<Graph> allGraphs = GraphManager.readGraphs();
                 boolean found = false;
 
+                //loops through graphs to find id and get confirmation message
                 for (int i = 0; i < allGraphs.size(); i++) {
                     Graph g = allGraphs.get(i);
                     if (g.getId().equals(inputId.trim())) {
@@ -186,52 +192,85 @@ public class MainScreen extends JPanel {
         }
     }
 
-
+    //SortTitle listener
     private class SortTitleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            try {
-                glist = GraphManager.readGraphs();
+            // Create radio buttons for the options
+            JRadioButton rbtnAZ = new JRadioButton("A-Z (ascending order)");
+            JRadioButton rbtnZA = new JRadioButton("Z-A (descending order)");
 
-                // Sort by title, ignoring case
-                glist.sort((g1, g2) -> g1.getTitle().compareToIgnoreCase(g2.getTitle()));
+            // Group the radio buttons so only one can be selected at a time
+            ButtonGroup group = new ButtonGroup();
+            group.add(rbtnAZ);
+            group.add(rbtnZA);
 
-                // Refresh the display with sorted list
-                pnlDisplay.removeAll();
-                for (Graph graph : glist) {
-                    JPanel card = new JPanel();
-                    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-                    card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-                    card.setBackground(new Color(245, 245, 245));
-                    card.setPreferredSize(new Dimension(250, 250));
+            // Create a panel to hold the radio buttons
+            JPanel panel = new JPanel();
+            panel.add(rbtnAZ);
+            panel.add(rbtnZA);
 
-                    JLabel imageLabel = new JLabel();
-                    ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
-                    Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
-                    imageLabel.setIcon(new ImageIcon(img));
+            // Show the option dialog
+            int option = JOptionPane.showConfirmDialog(
+                    thisForm,
+                    panel,
+                    "Please choose sort option: ",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
 
-                    JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
-                    JLabel idLabel = new JLabel("ID: " + graph.getId());
-                    JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
-                    JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
+            // If ok is selected, action is performed
+            if (option == JOptionPane.OK_OPTION) {
+                try {
+                    glist = GraphManager.readGraphs(); //reads graphs
 
-                    card.add(imageLabel);
-                    card.add(Box.createVerticalStrut(5));
-                    card.add(titleLabel);
-                    card.add(idLabel);
-                    card.add(timeLabel);
-                    card.add(modelLabel);
+                    // Sort based on selected radio button
+                    if (rbtnAZ.isSelected()) {
+                        // sorts from A-Z
+                        glist.sort((g1, g2) -> g1.getTitle().compareToIgnoreCase(g2.getTitle()));
+                    } else if (rbtnZA.isSelected()) {
+                        // sorts from Z-A
+                        glist.sort((g1, g2) -> g2.getTitle().compareToIgnoreCase(g1.getTitle()));
+                    }
 
-                    pnlDisplay.add(card);
+                    // Refresh the display with sorted list
+                    pnlDisplay.removeAll();
+                    for (Graph graph : glist) {
+                        JPanel card = new JPanel();
+                        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+                        card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+                        card.setBackground(new Color(245, 245, 245));
+                        card.setPreferredSize(new Dimension(250, 250));
+
+                        JLabel imageLabel = new JLabel();
+                        ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
+                        Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
+                        imageLabel.setIcon(new ImageIcon(img));
+
+                        JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
+                        JLabel idLabel = new JLabel("ID: " + graph.getId());
+                        JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
+                        JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
+
+                        card.add(imageLabel);
+                        card.add(Box.createVerticalStrut(5));
+                        card.add(titleLabel);
+                        card.add(idLabel);
+                        card.add(timeLabel);
+                        card.add(modelLabel);
+
+                        pnlDisplay.add(card);
+                    }
+
+                    pnlDisplay.revalidate();
+                    pnlDisplay.repaint();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(thisForm, "Error sorting by title: " + ex.getMessage());
                 }
-
-                pnlDisplay.revalidate();
-                pnlDisplay.repaint();
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(thisForm, "Error sorting by title: " + ex.getMessage());
             }
         }
     }
 
+    //sorts graphs by time created
     private class SortTimeListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // Create radio buttons for the options
@@ -257,14 +296,14 @@ public class MainScreen extends JPanel {
                     JOptionPane.PLAIN_MESSAGE
             );
 
-            // If the user presses "OK", perform sorting based on selected option
+            // If ok is selected, action is performed
             if (option == JOptionPane.OK_OPTION) {
                 try {
-                    glist = GraphManager.readGraphs();
+                    glist = GraphManager.readGraphs(); //reads graphs
 
                     // Sort based on selected radio button
                     if (rbtnNewestToOldest.isSelected()) {
-                        // Newest to Oldest
+                        // sorts by Newest to Oldest
                         glist.sort((g1, g2) -> g2.getTimeStamp().compareTo(g1.getTimeStamp()));
                     } else if (rbtnOldestToNewest.isSelected()) {
                         // Oldest to Newest

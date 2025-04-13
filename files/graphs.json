@@ -126,29 +126,21 @@
     "imagePath": "files/images/untitled-1744504087743.png"
   },
   {
-    "id": "untitled-1744500547614",
-    "title": "therealest",
+    "id": "82801",
+    "title": "disisit",
     "points": [
       {
+        "x": 1.0,
+        "y": 2.0
+      },
+      {
         "x": 2.0,
-        "y": 5.0
-      },
-      {
-        "x": 5.0,
-        "y": 6.0
-      },
-      {
-        "x": 7.0,
-        "y": 8.0
-      },
-      {
-        "x": 8.0,
-        "y": 11.0
+        "y": 3.0
       }
     ],
     "modelName": "None",
-    "timeStamp": "2025-04-12T23:29:07.614604900Z",
+    "timeStamp": "2025-04-13T03:24:35.004705700Z",
     "connect_points": true,
-    "imagePath": "files/images/untitled-1744500547614.png"
+    "imagePath": "files/images/82801.png"
   }
 ]
