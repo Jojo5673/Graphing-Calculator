@@ -11,7 +11,7 @@ public class MainScreen extends JPanel {
     private JButton cmdDeleteGraph;
     private JButton cmdClose;
     private JButton cmdSortTitle;
-    private JButton cmdSortModel;
+    private JButton cmdSortID;
 
     private JPanel pnlCommand;
     private JPanel pnlDisplay;
@@ -37,7 +37,7 @@ public class MainScreen extends JPanel {
         cmdDeleteGraph = new JButton("Delete Graph");
         cmdClose = new JButton("Close");
         cmdSortTitle = new JButton("Sort by Title");
-        cmdSortModel = new JButton("Sort by Model");
+        cmdSortID = new JButton("Sort by ID");
 
         // Button Listeners
         cmdAddGraph.addActionListener(e -> {
@@ -47,7 +47,7 @@ public class MainScreen extends JPanel {
         cmdEditGraph.addActionListener(new EditGraphListener());
         cmdDeleteGraph.addActionListener(new DeleteGraphListener());
         cmdSortTitle.addActionListener(new SortTitleListener());
-        cmdSortModel.addActionListener(new SortModelListener());
+        cmdSortID.addActionListener(new SortIDListener());
         cmdClose.addActionListener(e -> System.exit(0));
         cmdClose.setBackground(new Color(255, 199, 206)); // Light red for Close
 
@@ -56,7 +56,7 @@ public class MainScreen extends JPanel {
         pnlCommand.add(cmdEditGraph);
         pnlCommand.add(cmdDeleteGraph);
         pnlCommand.add(cmdSortTitle);
-        pnlCommand.add(cmdSortModel);
+        pnlCommand.add(cmdSortID);
         pnlCommand.add(cmdClose);
 
         add(pnlCommand, BorderLayout.SOUTH);
@@ -187,13 +187,52 @@ public class MainScreen extends JPanel {
     }
 
 
-    private static class SortTitleListener implements ActionListener {
+    private class SortTitleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            // TODO: Sort by title
+            try {
+                glist = GraphManager.readGraphs();
+
+                // Sort by title, ignoring case
+                glist.sort((g1, g2) -> g1.getTitle().compareToIgnoreCase(g2.getTitle()));
+
+                // Refresh the display with sorted list
+                pnlDisplay.removeAll();
+                for (Graph graph : glist) {
+                    JPanel card = new JPanel();
+                    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+                    card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+                    card.setBackground(new Color(245, 245, 245));
+                    card.setPreferredSize(new Dimension(250, 250));
+
+                    JLabel imageLabel = new JLabel();
+                    ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
+                    Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(img));
+
+                    JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
+                    JLabel idLabel = new JLabel("ID: " + graph.getId());
+                    JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
+                    JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
+
+                    card.add(imageLabel);
+                    card.add(Box.createVerticalStrut(5));
+                    card.add(titleLabel);
+                    card.add(idLabel);
+                    card.add(timeLabel);
+                    card.add(modelLabel);
+
+                    pnlDisplay.add(card);
+                }
+
+                pnlDisplay.revalidate();
+                pnlDisplay.repaint();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(thisForm, "Error sorting by title: " + ex.getMessage());
+            }
         }
     }
 
-    private static class SortModelListener implements ActionListener {
+    private static class SortIDListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // TODO: Sort by model
         }
