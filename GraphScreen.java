@@ -43,7 +43,7 @@ public class GraphScreen {
 
         JTextArea pointArea = new JTextArea(5,20);//Text Area for points
         JComboBox<String> regressionMenu = new JComboBox<>(new String[]{//Drop down menu for regression
-                "None", "Exponential", "Logarithmic", "Logistic", "Polynomial", "Power", "Sinusoidal"
+                "None", "Exponential", "Logarithmic", "Logistic", "Polynomial", "Power"
         });
         regressionMenu.setMaximumSize(new Dimension(1500,100));//Change dimension of drop down
 
@@ -182,7 +182,6 @@ public class GraphScreen {
             }
 
             case "Power" -> graph.setRegression(new PowerRegression(points));
-            case "Sinusoidal" -> graph.setRegression(new SinusoidalRegression(points));
         }
     }
 
