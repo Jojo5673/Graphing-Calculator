@@ -177,6 +177,7 @@ public class GraphScreen {
                     if(order<1||order>4) throw new NumberFormatException();
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Invalid input. Defaulting to order 2");
+                    order = 2;
                 }
                 graph.setRegression(new PolynomialRegression(points,order));
             }
@@ -253,8 +254,8 @@ public class GraphScreen {
                 chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
                 chart.addSeries("x=0", new double[]{0,0}, new double[]{scale_to_min ?min:y_range[0], y_range[1]}).setMarker(SeriesMarkers.NONE); // x=0 axis
             }else{
-                chart.addSeries("y=0", new double[]{-10, 10}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
-                chart.addSeries("x=0", new double[]{0,0}, new double[]{-10, 10}).setMarker(SeriesMarkers.NONE); // x=0 axis
+                chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE); // y=0 axis
+                chart.addSeries("x=0", new double[]{0,0}, new double[]{min_padded.getY(), max_padded.getY()}).setMarker(SeriesMarkers.NONE); // x=0 axis
             }
 
             //drawing x and y axes on the graph sheet
