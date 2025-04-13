@@ -46,10 +46,10 @@ public class LogisitcRegression extends RegressionModel {
             double y = a / (1 + Math.exp(-b * (x - c)));
             xFit.add(x);
             yFit.add(y);
-            if (x == x_range[0]){
+            if (y < y_range[0]) {
                 y_range[0] = y;
             }
-            if (x + detail > x_range[1]) {
+            if (y > y_range[1]) {
                 y_range[1] = y;
             }
         }

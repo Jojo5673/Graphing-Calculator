@@ -170,6 +170,7 @@ public class GraphScreen {
         //Close button logic
         cmdClose.addActionListener(e -> frame.dispose());
     }
+
     //Builds a graph from user input
     private static void updateFromInput(Graph graph, String title, String newPoints, String regType, boolean connect, Component parent){
         //Parse input into graph points
@@ -268,10 +269,10 @@ public class GraphScreen {
                     regression.fit();
                     chart.addSeries(regression.getModelName(), regression.getxFit(), regression.getyFit()).setMarker(SeriesMarkers.NONE).setLineStyle(SeriesLines.SOLID).setShowInLegend(false);
                     double[] y_range = regression.getY_range();
-                    double min = y_range[0] < 0?y_pad:-y_pad;
-                    boolean scale_to_min = Math.abs(y_range[1]-y_range[0])<Math.abs(y_range[1]-min);
+                    double min = Math.min(y_range[0], min_padded.getY());
+                    double max = Math.max(y_range[1], max_padded.getY());
                     chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.GREEN); // y=0 axis
-                    chart.addSeries("x=0", new double[]{0,0}, new double[]{scale_to_min ?min:y_range[0], y_range[1]}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // x=0 axis
+                    chart.addSeries("x=0", new double[]{0,0}, new double[]{min, max}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // x=0 axis
                 } catch (ConvergenceException | IllegalArgumentException e) {
                     JOptionPane.showMessageDialog(null, "Invalid Points for Regression");
                     regression = new None();

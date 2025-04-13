@@ -47,7 +47,6 @@ public class PolynomialRegression extends RegressionModel {
             }
         }
         function = function_builder.toString();
-
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
@@ -55,10 +54,10 @@ public class PolynomialRegression extends RegressionModel {
             }
             xFit.add(x);
             yFit.add(y);
-            if (x == x_range[0]){
+            if (y < y_range[0]) {
                 y_range[0] = y;
             }
-            if (x + detail > x_range[1]) {
+            if (y > y_range[1]) {
                 y_range[1] = y;
             }
         }

@@ -1,103 +1,7 @@
 [
   {
-    "id": "untitled-1744487784069",
-    "title": "Wtf is going on",
-    "points": [
-      {
-        "x": 2.0,
-        "y": 5.0
-      },
-      {
-        "x": 5.0,
-        "y": 6.0
-      },
-      {
-        "x": 7.0,
-        "y": 8.0
-      },
-      {
-        "x": 8.0,
-        "y": 11.0
-      }
-    ],
-    "modelName": "Quadratic",
-    "timeStamp": "2025-04-12T19:56:24.069224100Z",
-    "connect_points": false,
-    "imagePath": "files/images/untitled-1744487784069.png"
-  },
-  {
-    "id": "untitled-1744487941344",
-    "title": "Potato",
-    "points": [
-      {
-        "x": 1.0,
-        "y": 2.0
-      },
-      {
-        "x": 3.0,
-        "y": 4.0
-      },
-      {
-        "x": 5.0,
-        "y": 6.0
-      }
-    ],
-    "modelName": "Logarithmic",
-    "timeStamp": "2025-04-12T19:59:01.344860900Z",
-    "connect_points": true,
-    "imagePath": "files/images/untitled-1744487941344.png"
-  },
-  {
-    "id": "untitled-1744495795578",
-    "title": "nigotato",
-    "points": [
-      {
-        "x": 1.0,
-        "y": 3.0
-      },
-      {
-        "x": 0.0,
-        "y": 2.0
-      },
-      {
-        "x": 3.0,
-        "y": 66.0
-      },
-      {
-        "x": 0.0,
-        "y": 88.0
-      }
-    ],
-    "modelName": "Quartic",
-    "timeStamp": "2025-04-12T22:09:55.578566800Z",
-    "connect_points": true,
-    "imagePath": "files/images/untitled-1744495795578.png"
-  },
-  {
-    "id": "untitled-1744496773311",
-    "title": "onefishtwofish",
-    "points": [
-      {
-        "x": 1.0,
-        "y": 2.0
-      },
-      {
-        "x": 6.0,
-        "y": 8.0
-      },
-      {
-        "x": 19.0,
-        "y": 48.0
-      }
-    ],
-    "modelName": "Exponential",
-    "timeStamp": "2025-04-12T22:26:13.311591200Z",
-    "connect_points": true,
-    "imagePath": "files/images/untitled-1744496773311.png"
-  },
-  {
-    "id": "untitled-1744504087743",
-    "title": "Fail test",
+    "id": "63672",
+    "title": "None Test",
     "points": [
       {
         "x": 2.0,
@@ -121,26 +25,8 @@
       }
     ],
     "modelName": "None",
-    "timeStamp": "2025-04-13T00:28:07.743123500Z",
+    "timeStamp": "2025-04-13T04:37:43.618260600Z",
     "connect_points": false,
-    "imagePath": "files/images/untitled-1744504087743.png"
-  },
-  {
-    "id": "82801",
-    "title": "disisit",
-    "points": [
-      {
-        "x": 1.0,
-        "y": 2.0
-      },
-      {
-        "x": 2.0,
-        "y": 3.0
-      }
-    ],
-    "modelName": "None",
-    "timeStamp": "2025-04-13T03:24:35.004705700Z",
-    "connect_points": true,
-    "imagePath": "files/images/82801.png"
+    "imagePath": "files/images/63672.png"
   }
 ]
