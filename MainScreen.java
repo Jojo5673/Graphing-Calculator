@@ -67,6 +67,7 @@ public class MainScreen extends JPanel {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Graph Information");
+            frame.setPreferredSize(new Dimension(600, 800));
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setContentPane(new MainScreen());
             frame.pack();

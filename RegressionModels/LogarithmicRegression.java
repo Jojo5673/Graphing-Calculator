@@ -35,6 +35,9 @@ public class LogarithmicRegression extends RegressionModel {
     public void fit() {
         SimpleCurveFitter fitter = SimpleCurveFitter.create(logarithmic, new double[]{1, 1});
         double[] coeff = fitter.fit(points.toList());
+        if (x_range[0] < detail) {
+            x_range[0] = detail;
+        }
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] + coeff[1] * Math.log(x);
             xFit.add(x);
