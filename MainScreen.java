@@ -125,6 +125,31 @@ public class MainScreen extends JPanel {
             card.add(modelLabel);
             card.add(timeLabel);
 
+            //allows for each graph to be clickable by using a mouse object
+            card.addMouseListener(new MouseAdapter() {
+              //  @Override
+                public void mouseClicked(MouseEvent e) {
+                    try {
+                        openGraphForEditing(graph); // allows graph to be edited (without searching for ID)
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                //@Override
+                public void mouseEntered(MouseEvent e) {
+                    card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    card.setBackground(new Color(230, 230, 230)); // hover effect for the mouse
+                }
+
+              //  @Override
+                public void mouseExited(MouseEvent e) {
+                    card.setCursor(Cursor.getDefaultCursor());
+                    card.setBackground(new Color(245, 245, 245)); // hover effect resets
+                }
+            });
+
+
             for (Component comp : card.getComponents()) {
                 if (comp instanceof JComponent) {
                     ((JComponent) comp).setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -133,8 +158,15 @@ public class MainScreen extends JPanel {
             pnlDisplay.add(card);
         }
 
+
         pnlDisplay.revalidate();
         pnlDisplay.repaint();
+    }
+
+    //Function for editing graph
+    public void openGraphForEditing(Graph g) throws IOException {
+        g.LoadRegression();
+        new GraphScreen(thisForm, g);
     }
 
    //Listeners
@@ -150,8 +182,7 @@ public class MainScreen extends JPanel {
                 ArrayList<Graph> allGraphs = GraphManager.readGraphs();
                 for (Graph g : allGraphs) {
                     if (g.getId().equals(inputId.trim())) {
-                        g.LoadRegression(); // Reload regression
-                        new GraphScreen(thisForm, g); // Launch with existing graph
+                        openGraphForEditing(g);
                         return;
                     }
                 }
