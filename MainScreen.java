@@ -3,6 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class MainScreen extends JPanel {
     // Buttons
@@ -27,7 +30,8 @@ public class MainScreen extends JPanel {
 
         pnlCommand = new JPanel();
         pnlDisplay = new JPanel();
-        pnlDisplay.setLayout(new GridLayout(0, 2, 10, 10)); // Display 2 graph cards per row
+        pnlDisplay.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        pnlDisplay.setPreferredSize(new Dimension(790, 700));
 
         //Adds scroll pane
         JScrollPane scrollPane = new JScrollPane(pnlDisplay);
@@ -70,53 +74,67 @@ public class MainScreen extends JPanel {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Graph Information");
-            frame.setPreferredSize(new Dimension(600, 800));
+            //frame.setPreferredSize(new Dimension(550, 800));
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setContentPane(new MainScreen());
             frame.pack();
             frame.setVisible(true);
         });
     }
-
     // Refresh the image + label-based graph cards
     public void refreshDisplayPanel() {
-        pnlDisplay.removeAll();
-
         try {
             glist = GraphManager.readGraphs();
-
-            for (Graph graph : glist) {
-                JPanel card = new JPanel();
-                card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-                card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-                card.setBackground(new Color(245, 245, 245));
-                card.setPreferredSize(new Dimension(250, 250));
-
-                JLabel imageLabel = new JLabel();
-                ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
-                Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
-                imageLabel.setIcon(new ImageIcon(img));
-
-                JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
-                JLabel idLabel = new JLabel("ID: " + graph.getId());
-                JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
-                JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
-
-                card.add(imageLabel);
-                card.add(Box.createVerticalStrut(5));
-                card.add(titleLabel);
-                card.add(idLabel);
-                card.add(timeLabel);
-                card.add(modelLabel);
-
-                pnlDisplay.add(card);
-            }
-
-            pnlDisplay.revalidate();
-            pnlDisplay.repaint();
+            populateDisplayPanel(glist);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Failed to load graphs: " + ex.getMessage());
         }
+    }
+
+    public void populateDisplayPanel(ArrayList<Graph> glist) {
+        pnlDisplay.removeAll();
+        for (Graph graph : glist) {
+            JPanel card = new JPanel();
+            card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+            card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.GRAY, 1),
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10) // top, left, bottom, right padding
+            ));
+            card.setBackground(new Color(245, 245, 245));
+            card.setPreferredSize(new Dimension(250, 250));
+
+            JLabel imageLabel = new JLabel();
+            ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
+            Image img = icon.getImage().getScaledInstance(230, 138, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+
+            JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
+            JLabel idLabel = new JLabel("ID: " + graph.getId());
+
+            ZonedDateTime timeStamp = graph.getTimeStamp().atZone(ZoneId.systemDefault());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a");
+            String formatted = timeStamp.format(formatter);
+
+            JLabel timeLabel = new JLabel("Created: " + formatted);
+            JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
+
+            card.add(imageLabel);
+            card.add(Box.createVerticalStrut(5));
+            card.add(titleLabel);
+            card.add(idLabel);
+            card.add(modelLabel);
+            card.add(timeLabel);
+
+            for (Component comp : card.getComponents()) {
+                if (comp instanceof JComponent) {
+                    ((JComponent) comp).setAlignmentX(Component.CENTER_ALIGNMENT);
+                }
+            }
+            pnlDisplay.add(card);
+        }
+
+        pnlDisplay.revalidate();
+        pnlDisplay.repaint();
     }
 
    //Listeners
@@ -233,36 +251,7 @@ public class MainScreen extends JPanel {
                     }
 
                     // Refresh the display with sorted list
-                    pnlDisplay.removeAll();
-                    for (Graph graph : glist) {
-                        JPanel card = new JPanel();
-                        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-                        card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-                        card.setBackground(new Color(245, 245, 245));
-                        card.setPreferredSize(new Dimension(250, 250));
-
-                        JLabel imageLabel = new JLabel();
-                        ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
-                        Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
-                        imageLabel.setIcon(new ImageIcon(img));
-
-                        JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
-                        JLabel idLabel = new JLabel("ID: " + graph.getId());
-                        JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
-                        JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
-
-                        card.add(imageLabel);
-                        card.add(Box.createVerticalStrut(5));
-                        card.add(titleLabel);
-                        card.add(idLabel);
-                        card.add(timeLabel);
-                        card.add(modelLabel);
-
-                        pnlDisplay.add(card);
-                    }
-
-                    pnlDisplay.revalidate();
-                    pnlDisplay.repaint();
+                    populateDisplayPanel(glist);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(thisForm, "Error sorting by title: " + ex.getMessage());
                 }
@@ -309,39 +298,7 @@ public class MainScreen extends JPanel {
                         // Oldest to Newest
                         glist.sort((g1, g2) -> g1.getTimeStamp().compareTo(g2.getTimeStamp()));
                     }
-
-                    // Refresh the display with sorted list
-                    pnlDisplay.removeAll();
-                    for (Graph graph : glist) {
-                        JPanel card = new JPanel();
-                        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-                        card.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-                        card.setBackground(new Color(245, 245, 245));
-                        card.setPreferredSize(new Dimension(250, 250));
-
-                        JLabel imageLabel = new JLabel();
-                        ImageIcon icon = new ImageIcon(graph.getImagePath()); // Path to graph image
-                        Image img = icon.getImage().getScaledInstance(200, 120, Image.SCALE_SMOOTH);
-                        imageLabel.setIcon(new ImageIcon(img));
-
-                        JLabel titleLabel = new JLabel("Title: " + graph.getTitle());
-                        JLabel idLabel = new JLabel("ID: " + graph.getId());
-                        JLabel timeLabel = new JLabel("Created: " + graph.getTimeStamp());
-                        JLabel modelLabel = new JLabel("Model: " + graph.getRegression().getModelName());
-
-                        card.add(imageLabel);
-                        card.add(Box.createVerticalStrut(5));
-                        card.add(titleLabel);
-                        card.add(idLabel);
-                        card.add(timeLabel);
-                        card.add(modelLabel);
-
-                        pnlDisplay.add(card);
-                    }
-
-                    pnlDisplay.revalidate();
-                    pnlDisplay.repaint();
-
+                    populateDisplayPanel(glist);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(thisForm, "Error sorting by time: " + ex.getMessage());
                 }

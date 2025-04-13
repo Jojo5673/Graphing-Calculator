@@ -137,7 +137,8 @@ public class GraphScreen {
             }
             //Create graph
             updateFromInput(graph, name.trim(),pointArea.getText(),(String) regressionMenu.getSelectedItem(),connectPoints.isSelected(),frame);
-            JPanel newGraphPanel = new XChartPanel<>(drawGraph(graph, frame));
+            XYChart newChart = drawGraph(graph, frame);
+            JPanel newGraphPanel = new XChartPanel<>(newChart);
             frame.getContentPane().removeAll(); // clear old content
             frame.add(controlPanel, BorderLayout.WEST);
             frame.add(newGraphPanel, BorderLayout.CENTER);
@@ -148,7 +149,7 @@ public class GraphScreen {
                 //firstly it makes an image path as files/images/graphid.png
                 String imagePath = "files/images/" + graph.getId();
                 graph.setImagePath(imagePath + ".png");
-                save(drawGraph(graph, frame), imagePath);
+                save(newChart, imagePath);
                 //Adds and saves the graph to the graph file
                 ArrayList<Graph> graphs = GraphManager.readGraphs();
                 graphs.removeIf(g -> g.getId().equals(graph.getId()));
@@ -284,8 +285,8 @@ public class GraphScreen {
                 //below is code for scaling the x and y axis
             }
             if (Objects.equals(regression.getModelName(), "None")) {
-                chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.GREEN); // y=0 axis
-                chart.addSeries("x=0", new double[]{0,0}, new double[]{min_padded.getY(), max_padded.getY()}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // x=0 axis
+                chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // y=0 axis
+                chart.addSeries("x=0", new double[]{0,0}, new double[]{min_padded.getY(), max_padded.getY()}).setMarker(SeriesMarkers.NONE).setLineColor(Color.GREEN); // x=0 axis
             }
 
             //drawing x and y axes on the graph sheet
@@ -320,7 +321,7 @@ public class GraphScreen {
             double[] yData = series.getYData();
 
             //makes the plot while preserving all the styling things
-            chart.addSeries(name, xData, yData).setMarker(series.getMarker()).setLineStyle(series.getLineStyle());
+            chart.addSeries(name, xData, yData).setMarker(series.getMarker()).setLineStyle(series.getLineStyle()).setLineColor(series.getLineColor());
         }
         //new styling to remove all the extra stuff we dont want in the picture
         chartStyler.setChartBackgroundColor(saveStyler.getChartBackgroundColor()).setLegendVisible(false);
