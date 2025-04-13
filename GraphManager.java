@@ -10,11 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
 public class GraphManager {
     public static String JsonfilePath = "files/graphs.json";
@@ -143,5 +145,19 @@ public class GraphManager {
                 throws JsonParseException {
             return Instant.parse(json.getAsString());
         }
+    }
+
+    //used to get existing graphIDs
+    public static Set<String> getExistingGraphIds() {
+        Set<String> idSet = new HashSet<>();
+        try {
+            ArrayList<Graph> glist = readGraphs();
+            for (Graph graph : glist) {
+                idSet.add(graph.getId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // or handle more gracefully
+        }
+        return idSet;
     }
 }

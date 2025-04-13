@@ -117,9 +117,26 @@ public class MainScreen extends JPanel {
     }
 
     // Placeholder listeners
-    private static class EditGraphListener implements ActionListener {
+    private class EditGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            // TODO: Implement Edit
+            String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to edit:");
+            if (inputId == null || inputId.trim().isEmpty()) {
+                return;
+            }
+
+            try {
+                ArrayList<Graph> allGraphs = GraphManager.readGraphs();
+                for (Graph g : allGraphs) {
+                    if (g.getId().equals(inputId.trim())) {
+                        g.LoadRegression(); // Reload regression
+                        new GraphScreen(thisForm, g); // Launch with existing graph
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(thisForm, "Graph ID not found.");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(thisForm, "Error loading graphs: " + ex.getMessage());
+            }
         }
     }
 

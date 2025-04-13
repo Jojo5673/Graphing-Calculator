@@ -1,6 +1,8 @@
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.time.Instant;
+import java.util.Random;
+import java.util.Set;
 
 import RegressionModels.*;
 
@@ -48,6 +50,7 @@ public class Graph {
         this.timeStamp = Instant.now();
     }
 
+    /*
     //used to generate a unique code for each graph based on their title and when they were created
     //format: graph-title-345698708263
     private void GenerateID(){
@@ -56,6 +59,21 @@ public class Graph {
         //creates the appends the time to the title to create the id
         id = base + "-" + Instant.now().toEpochMilli();
     }
+    */
+
+    private void GenerateID() {
+        Set<String> existingIds = GraphManager.getExistingGraphIds(); // You'd need to implement this
+
+        Random rand = new Random();
+        String newId;
+        do {
+            int randomId = 10000 + rand.nextInt(90000);
+            newId = String.valueOf(randomId);
+        } while (existingIds.contains(newId));
+
+        id = newId;
+    }
+
 
     //used for when the graph is being loaded from storage since we cant store the regression classes in the file
     public void LoadRegression() {

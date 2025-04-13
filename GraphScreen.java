@@ -17,10 +17,19 @@ public class GraphScreen {
     private MainScreen mscreen; //instance of main screen
     private GraphScreen gscreen;
 
+    public GraphScreen(MainScreen mscreen, Graph graphToEdit) {
+        this.mscreen = mscreen;
+       // Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
+      //  plot(emptyGraph);
+        plot(graphToEdit != null ? graphToEdit : new Graph("Untitled", new ArrayList<>()));
+    }
+
+    //alternate constructor
     public GraphScreen(MainScreen mscreen) {
         this.mscreen = mscreen;
         Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
         plot(emptyGraph);
+        //plot(graphToEdit != null ? graphToEdit : new Graph("Untitled", new ArrayList<>()));
     }
 
 
@@ -29,7 +38,7 @@ public class GraphScreen {
         //makes the frame for the graph manager
 
         //displays chart window with equation
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(1280, 720);
         //adds the graph panel
         frame.add(new XChartPanel<>(drawGraph(graph, frame)), BorderLayout.CENTER);
@@ -42,14 +51,30 @@ public class GraphScreen {
         controlPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));//Padding around panel
 
         JTextArea pointArea = new JTextArea(5,20);//Text Area for points
+
         JComboBox<String> regressionMenu = new JComboBox<>(new String[]{//Drop down menu for regression
                 "None", "Exponential", "Logarithmic", "Logistic", "Polynomial", "Power", "Sinusoidal"
         });
         regressionMenu.setMaximumSize(new Dimension(1500,100));//Change dimension of drop down
 
         JCheckBox connectPoints = new JCheckBox("Connect Points");//Checkbox for connecting points
+
+        //if graph has points populate
+        if (!graph.getPoints().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (Point2D.Double p : graph.getPoints()) {
+                sb.append(p.getX()).append(", ").append(p.getY()).append("\n");
+            }
+            pointArea.setText(sb.toString());
+            regressionMenu.setSelectedItem(graph.getRegression().getModelName());
+            connectPoints.setSelected(graph.isConnect_points());
+        }
+
         JButton plotButton = new JButton("Plot Graph");//Button to plot graph
         JButton saveButton = new JButton("Save Graph");//Button to save graph
+        JButton cmdClose = new JButton("Close");
+        cmdClose.setBackground(new Color(255, 199, 206)); // Light red for Close
+
         JPanel equation = new JPanel();
         JLabel eqLabel = new JLabel("Best Fit Equation: ");
         eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -70,6 +95,7 @@ public class GraphScreen {
         controlPanel.add(connectPoints);
         controlPanel.add(plotButton);
         controlPanel.add(saveButton);
+        controlPanel.add(cmdClose);
         for (Component comp : controlPanel.getComponents()) {
             if (comp instanceof JComponent) {
                 ((JComponent) comp).setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -128,6 +154,7 @@ public class GraphScreen {
                 save(drawGraph(graph, frame), imagePath);
                 //Adds and saves the graph to the graph file
                 ArrayList<Graph> graphs = GraphManager.readGraphs();
+                graphs.removeIf(g -> g.getId().equals(graph.getId()));
                 graphs.add(graph);
                 GraphManager.writeGraphs(graphs);
 
@@ -142,6 +169,9 @@ public class GraphScreen {
             }
 
         });
+
+        //Close button logic
+        cmdClose.addActionListener(e -> frame.dispose());
     }
     //Builds a graph from user input
     private static void updateFromInput(Graph graph, String title, String newPoints, String regType, boolean connect, Component parent){
