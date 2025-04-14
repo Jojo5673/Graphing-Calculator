@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.time.ZoneId;
@@ -56,7 +57,7 @@ public class MainScreen extends JPanel {
         // Button Listeners
         cmdAddGraph.addActionListener(e -> {
             new GraphScreen(thisForm);
-            refreshDisplayPanel();
+            //refreshDisplayPanel();
         });
         cmdEditGraph.addActionListener(new EditGraphListener());
         cmdDeleteGraph.addActionListener(new DeleteGraphListener());
@@ -80,6 +81,32 @@ public class MainScreen extends JPanel {
 
     //Main declaration
     public static void main(String[] args) {
+        File folder = new File("files");
+        File json = new File(folder, "graphs.json");
+        File images = new File(folder, "images");
+        try {
+            // Create folder if it doesn't exist
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
+            // Create images subfolder
+            if (!images.exists()) {
+                images.mkdirs();
+            }
+
+            // Create the data file
+            if (!json.exists()) {
+                json.createNewFile();
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Failed to create files. Please try again.",
+                    "Save Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Graph Information");
             //frame.setPreferredSize(new Dimension(550, 800));
@@ -103,6 +130,9 @@ public class MainScreen extends JPanel {
         try {
             glist = GraphManager.readGraphs();
             populateDisplayPanel(glist);
+            if (glist.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No data found. Add graphs to get started");
+            }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Failed to load graphs: " + ex.getMessage());
         }
