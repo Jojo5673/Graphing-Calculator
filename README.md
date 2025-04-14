@@ -7,4 +7,4 @@ Submission for COMP1161 course project. A graphing calculator built using **Java
 - Store, organize and retrieve previous graphs.  
 
 ## How to Run
-- Download and run the Project.jar file 
+- Download and run the Project.jar file in builds
