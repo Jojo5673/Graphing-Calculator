@@ -8,6 +8,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * MainScreen represents the primary user interface panel for viewing,
+ * sorting, adding, editing, and deleting graph visualizations.
+ * It uses Swing components to display a scrollable set of graph cards
+ * along with command buttons at the bottom.
+ */
+
 public class MainScreen extends JPanel {
     // Buttons
     private JButton cmdAddGraph;
@@ -23,8 +30,10 @@ public class MainScreen extends JPanel {
     private MainScreen thisForm;
 
     private ArrayList<Graph> glist = new ArrayList<>();
-
-    // Constructor for Main Screen
+    /**
+     * Constructor for MainScreen.
+     * Initializes UI components and loads saved graphs into the display panel.
+     */
     public MainScreen() {
         super(new BorderLayout());
         thisForm = this;
@@ -79,7 +88,10 @@ public class MainScreen extends JPanel {
         refreshDisplayPanel(); // Load graphs on startup
     }
 
-    //Main declaration
+    /**
+     * Launches the MainScreen in a JFrame window.
+     * @param args Command-line arguments
+     */
     public static void main(String[] args) {
         File folder = new File("files");
         File json = new File(folder, "graphs.json");
@@ -125,7 +137,10 @@ public class MainScreen extends JPanel {
         pnlDisplay.setLayout(new GridLayout(0, columns, hgap, 10));
         pnlDisplay.revalidate();
     }
-    // Refresh the image + label-based graph cards
+
+    /**
+     * Reads graphs from persistent storage and updates the display panel.
+     */
     public void refreshDisplayPanel() {
         try {
             glist = GraphManager.readGraphs();
@@ -138,6 +153,10 @@ public class MainScreen extends JPanel {
         }
     }
 
+    /**
+     * Displays the list of graphs as cards in the UI.
+     * @param glist List of Graph objects to be displayed.
+     */
     public void populateDisplayPanel(ArrayList<Graph> glist) {
         pnlDisplay.removeAll();
         for (Graph graph : glist) {
@@ -258,13 +277,19 @@ public class MainScreen extends JPanel {
         pnlDisplay.repaint();
     }
 
-    //Function for editing graph
+    /**
+     * Opens the GraphScreen for editing the provided Graph object.
+     * @param g Graph to edit
+     * @throws IOException if regression model loading fails
+     */
     public void openGraphForEditing(Graph g) throws IOException {
         g.LoadRegression();
         new GraphScreen(thisForm, g);
     }
 
-   //Listeners
+    /**
+     * Listener for editing a graph by its ID.
+     */
     private class EditGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to edit:");
@@ -288,7 +313,9 @@ public class MainScreen extends JPanel {
         }
     }
 
-    //Listener for delete graph
+    /**
+     * Listener for deleting a graph by its ID.
+     */
     private class DeleteGraphListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String inputId = JOptionPane.showInputDialog(thisForm, "Enter Graph ID to delete:");
@@ -336,7 +363,9 @@ public class MainScreen extends JPanel {
         }
     }
 
-    //SortTitle listener
+    /**
+     * Listener for sorting graphs by title in ascending or descending order.
+     */
     private class SortTitleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // Create radio buttons for the options
@@ -385,7 +414,9 @@ public class MainScreen extends JPanel {
         }
     }
 
-    //sorts graphs by time created
+    /**
+     * Listener for sorting graphs by creation timestamp (newest to oldest or vice versa).
+     */
     private class SortTimeListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // Create radio buttons for the options

@@ -18,6 +18,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
+/**
+ * The GraphManager class handles loading and saving Graph objects to a JSON file.
+ * It uses the Gson library to serialize and deserialize Graph data, allowing for
+ * easy and human-readable file storage. It also manages cleanup of unused image files.
+ */
+
 public class GraphManager {
     public static String JsonfilePath = "files/graphs.json";
     //keeps the data file's path for access anywhere

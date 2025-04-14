@@ -13,22 +13,61 @@ import java.util.List;
 
 import RegressionModels.*;
 
+/**
+ * The GraphScreen class provides a user interface for plotting and managing graphs.
+ * It allows for the creation, editing, and visualization of 2D graphs, including the
+ * application of various regression models (e.g., polynomial, exponential, logistic).
+ *
+ * Graphs can be saved, and the UI supports interactive updates of regression type and data points.
+ * Uses XChart for plotting and supports saving graphs with rendered previews.
+ *
+ * Dependencies:
+ * - XChart library for chart plotting.
+ * - Apache Commons Math for regression model fitting.
+ * - RegressionModels package for handling regression logic.
+ *
+ * @author
+ */
+
 public class GraphScreen {
     private MainScreen mscreen; //instance of main screen
     private GraphScreen gscreen;
+
+    /**
+     * Constructs a GraphScreen with a reference to the main screen and a graph to edit.
+     * If no graph is provided, creates a new empty graph.
+     *
+     * @param mscreen      The parent MainScreen object.
+     * @param graphToEdit  The graph object to edit; if null, a blank graph is used.
+     */
 
     public GraphScreen(MainScreen mscreen, Graph graphToEdit) {
         this.mscreen = mscreen;
         plot(graphToEdit != null ? graphToEdit : new Graph("Untitled", new ArrayList<>()));
     }
 
-    //alternate constructor for GraphScreen
+    /**
+     * Alternate constructor that creates an empty editable graph.
+     *
+     * @param mscreen  The parent MainScreen object.
+     */
+
     public GraphScreen(MainScreen mscreen) {
         this.mscreen = mscreen;
         Graph emptyGraph = new Graph("Untitled", new ArrayList<>()); // Pass empty graph for editing
         plot(emptyGraph);
     }
 
+    /**
+     * Displays a JFrame containing the interactive graph plot and control panel for:
+     * - Editing points
+     * - Selecting regression models
+     * - Connecting points
+     * - Saving the graph
+     * - Viewing best-fit equations
+     *
+     * @param graph  The graph object to display and edit.
+     */
 
     public void plot(Graph graph) {
         JFrame frame = new JFrame("Graph");
@@ -175,7 +214,19 @@ public class GraphScreen {
         cmdClose.addActionListener(e -> frame.dispose());
     }
 
-    //Builds a graph from user input
+    /**
+     * Builds or updates a Graph object based on user input:
+     * - Parses input point text
+     * - Sets regression type
+     * - Handles polynomial degree prompts
+     *
+     * @param graph     The graph object to modify.
+     * @param title     The title for the graph.
+     * @param newPoints A string containing points in (x,y) format per line.
+     * @param regType   The regression model name.
+     * @param connect   Whether to connect points with lines.
+     * @param parent    The UI component for error dialogs.
+     */
     private static void updateFromInput(Graph graph, String title, String newPoints, String regType, boolean connect, Component parent){
         //Parse input into graph points
         String[] lines = newPoints.split("\\n");
@@ -218,6 +269,17 @@ public class GraphScreen {
         }
     }
 
+    /**
+     * Draws and returns an XYChart representation of a Graph object.
+     * Applies padding and calculates bounds from the data. Also renders:
+     * - Scatter points
+     * - Regression lines (if applicable)
+     * - X and Y axes (y=0 and x=0)
+     *
+     * @param graph The Graph object to render.
+     * @param frame The parent frame used to sync colors with the chart background.
+     * @return An XYChart ready to be used in an XChartPanel.
+     */
     private static XYChart drawGraph(Graph graph, Frame frame) {
         //this block initialises parameters for the graph plot area
         //min and max axis are the points between which the graph show display its plot. this is gotten from the boundaries of the data points
@@ -306,6 +368,15 @@ public class GraphScreen {
         //returns the chart panel to the plot function
         return chart;
     }
+
+
+    /**
+     * Saves a chart as a PNG image file. Also updates graph metadata and serializes it.
+     *
+     * @param chart     The chart to save.
+     * @param imagePath Path to save the image (without extension).
+     * @throws IOException if image saving or file writing fails.
+     */
 
     private static void save(XYChart saveChart, String filepath) throws IOException {
         //this works by duplicating the graph and exporting it to a png at a specified file path

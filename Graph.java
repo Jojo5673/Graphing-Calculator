@@ -6,7 +6,10 @@ import java.util.Set;
 
 import RegressionModels.*;
 
-//object class for a Graph that stores information for it and useful functions
+/**
+ * Represents a graph containing a set of points, a regression model, and metadata.
+ * This class handles storing, identifying, and reconstructing graphs for later use.
+ */
 public class Graph {
     private String id; //unique hash generated to help with searching
     private String title;
@@ -35,13 +38,22 @@ public class Graph {
     public void setConnect_points(Boolean connect_points) {this.connect_points = connect_points;}
     public void setPoints(ArrayList<Point2D.Double> points) {this.points = points;}
     public void setTitle(String title) {this.title = title;}
+
+    /**
+     * Sets the regression model and updates the model name for future deserialization.
+     * @param regression the regression model to apply to the graph
+     */
     public void setRegression(RegressionModel regression) {
         this.regression = regression;
         this.modelName = regression.getModelName();
     }
 
-    //constructor we use
-    //its gets the title and points, generates its ID, and stores when the graph was created
+    /**
+     * Constructs a new Graph object with the given title and points.
+     * Generates a unique ID and records the current timestamp.
+     * @param title the title of the graph
+     * @param points the 2D points to be plotted
+     */
     public Graph(String title, ArrayList<Point2D.Double> points) {
         this.title = title;
         this.points = points;
@@ -50,17 +62,10 @@ public class Graph {
         this.timeStamp = Instant.now();
     }
 
-    /*
-    //used to generate a unique code for each graph based on their title and when they were created
-    //format: graph-title-345698708263
-    private void GenerateID(){
-        //removes all special characters from the string and replaces whitespaces with "-"
-        String base = title.toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9\\-]", "");
-        //creates the appends the time to the title to create the id
-        id = base + "-" + Instant.now().toEpochMilli();
-    }
-    */
-
+    /**
+     * Generates a unique ID for the graph using a random 5-digit number.
+     * Ensures that the ID is not already in use.
+     */
     private void GenerateID() {
         Set<String> existingIds = GraphManager.getExistingGraphIds(); // You'd need to implement this
 
@@ -75,7 +80,10 @@ public class Graph {
     }
 
 
-    //used for when the graph is being loaded from storage since we cant store the regression classes in the file
+    /**
+     * Loads the appropriate regression model based on the stored model name.
+     * This is used when reconstructing a graph from a saved JSON file.
+     */
     public void LoadRegression() {
         switch (modelName) {
             case "None":
