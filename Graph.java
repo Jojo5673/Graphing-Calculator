@@ -103,6 +103,7 @@ public class Graph {
                 regression = new PowerRegression(points);
                 break;
             case "Logistic":
+                regression = new LogisitcRegression(points);
                 break;
             default:
                 System.out.println("Unknown model name");

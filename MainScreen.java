@@ -30,12 +30,20 @@ public class MainScreen extends JPanel {
 
         pnlCommand = new JPanel();
         pnlDisplay = new JPanel();
-        pnlDisplay.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        pnlDisplay.setPreferredSize(new Dimension(790, 700));
+        pnlDisplay.setLayout(new GridLayout(0, 2, 10, 10));
 
         //Adds scroll pane
         JScrollPane scrollPane = new JScrollPane(pnlDisplay);
         add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); // 👈 Add this
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        scrollPane.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                int width = scrollPane.getViewport().getWidth(); // width available for content
+                updateGridLayout(width);
+            }
+        });
 
         // Buttons
         cmdAddGraph = new JButton("Add Graph");
@@ -76,10 +84,19 @@ public class MainScreen extends JPanel {
             JFrame frame = new JFrame("Graph Information");
             //frame.setPreferredSize(new Dimension(550, 800));
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setPreferredSize(new Dimension(600, 800));
             frame.setContentPane(new MainScreen());
             frame.pack();
             frame.setVisible(true);
         });
+    }
+    private void updateGridLayout(int containerWidth) {
+        int cardWidth = 250; // or whatever your card width is
+        int hgap = 10;
+
+        int columns = Math.max(1, containerWidth / (cardWidth + hgap));
+        pnlDisplay.setLayout(new GridLayout(0, columns, hgap, 10));
+        pnlDisplay.revalidate();
     }
     // Refresh the image + label-based graph cards
     public void refreshDisplayPanel() {

@@ -77,7 +77,10 @@ public class GraphScreen {
         eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         equation.setLayout(new BoxLayout(equation, BoxLayout.Y_AXIS));
         if (!Objects.equals(graph.getRegression().getModelName(), "None")) {
-            equation.add(new JLabel("Best Fit Equation: "));
+            eqLabel.setSize(equation.getWidth(), equation.getHeight());
+            eqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            equation.removeAll();
+            equation.add(eqLabel);
             equation.add(graph.getRegression().RenderEquation());
             equation.setVisible(true);
         }else{
@@ -248,8 +251,8 @@ public class GraphScreen {
         double max_range = max_axis.getY() - min_axis.getY() * 3;
         double[] maxY_fit = {min_axis.getY() - max_range, max_axis.getY() + max_range};
         //calculates padding by applying the padding % to the width of the points spread
-        double x_pad = padding * (max_axis.getX() - min_axis.getX());
-        double y_pad = padding * (max_axis.getY() - min_axis.getY());
+        double x_pad = max_axis.getX() - min_axis.getX()!=0 ? padding * (max_axis.getX() - min_axis.getX()) : 5;
+        double y_pad = max_axis.getY() - min_axis.getY()!=0 ? padding * (max_axis.getY() - min_axis.getY()) : 5;
         xy_padding = new Point2D.Double(x_pad, y_pad);
 
         //making the chart window
@@ -276,8 +279,8 @@ public class GraphScreen {
                     double[] y_range = regression.getY_range();
                     double min = Math.min(y_range[0], min_padded.getY());
                     double max = Math.max(y_range[1], max_padded.getY());
-                    chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.GREEN); // y=0 axis
-                    chart.addSeries("x=0", new double[]{0,0}, new double[]{min, max}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // x=0 axis
+                    chart.addSeries("y=0", new double[]{min_padded.getX(), max_padded.getX()}, new double[]{0,0}).setMarker(SeriesMarkers.NONE).setLineColor(Color.MAGENTA); // y=0 axis
+                    chart.addSeries("x=0", new double[]{0,0}, new double[]{min, max}).setMarker(SeriesMarkers.NONE).setLineColor(Color.GREEN); // x=0 axis
                 } catch (ConvergenceException | IllegalArgumentException e) {
                     JOptionPane.showMessageDialog(null, "Invalid Points for Regression");
                     regression = new None();

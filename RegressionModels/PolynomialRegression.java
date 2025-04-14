@@ -26,7 +26,8 @@ public class PolynomialRegression extends RegressionModel {
 
     public void fit() {
         double[] coeff = fitter.fit(points.toList());
-        StringBuilder function_builder = new StringBuilder("y = ");
+        String func = "y = ";
+        StringBuilder function_builder = new StringBuilder("");
 
         for (int i = coeff.length - 1; i >= 0; i--) {
             if (coeff[i] == 0) continue; // We dont want to include any 0x^n so we dont write 0 coefficients
@@ -46,7 +47,10 @@ public class PolynomialRegression extends RegressionModel {
                     function_builder.append("^").append(i); // Append exponent if i > 1 we want to print x instead of x^1
             }
         }
-        function = function_builder.toString();
+        if (function_builder.toString().equals("")) {
+            function_builder.append("0");
+        }
+        function = func + function_builder.toString();
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = 0;
             for (int i = coeff.length - 1; i >= 0; i--) {
