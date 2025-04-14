@@ -23,6 +23,7 @@ public class MainScreen extends JPanel {
     private JButton cmdClose;
     private JButton cmdSortTitle;
     private JButton cmdSortTime;
+    JScrollPane scrollPane;
 
     //Panel declarations
     private JPanel pnlCommand;
@@ -43,7 +44,7 @@ public class MainScreen extends JPanel {
         pnlDisplay.setLayout(new GridLayout(0, 2, 10, 10));
 
         //Adds scroll pane
-        JScrollPane scrollPane = new JScrollPane(pnlDisplay);
+        scrollPane = new JScrollPane(pnlDisplay);
         add(scrollPane, BorderLayout.CENTER);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); // 👈 Add this
@@ -51,7 +52,8 @@ public class MainScreen extends JPanel {
         scrollPane.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
                 int width = scrollPane.getViewport().getWidth(); // width available for content
-                updateGridLayout(width);
+                int height = scrollPane.getViewport().getHeight();
+                updateGridLayout(width, height, pnlDisplay.getComponentCount());
             }
         });
 
@@ -129,12 +131,14 @@ public class MainScreen extends JPanel {
             frame.setVisible(true);
         });
     }
-    private void updateGridLayout(int containerWidth) {
+    private void updateGridLayout(int containerWidth, int containerHeight, int numCards) {
         int cardWidth = 250; // or whatever your card width is
         int hgap = 10;
 
-        int columns = Math.max(1, containerWidth / (cardWidth + hgap));
-        pnlDisplay.setLayout(new GridLayout(0, columns, hgap, 10));
+        int columns = Math.max(2, containerWidth / (cardWidth + hgap));
+        int rows = Math.max(3, (int)Math.ceil((double)numCards / columns));
+
+        pnlDisplay.setLayout(new GridLayout(rows, columns, hgap, 10));
         pnlDisplay.revalidate();
     }
 
@@ -142,6 +146,9 @@ public class MainScreen extends JPanel {
      * Reads graphs from persistent storage and updates the display panel.
      */
     public void refreshDisplayPanel() {
+        int width = scrollPane.getViewport().getWidth(); // width available for content
+        int height = scrollPane.getViewport().getHeight();
+        updateGridLayout(width, height, pnlDisplay.getComponentCount());
         try {
             glist = GraphManager.readGraphs();
             populateDisplayPanel(glist);
