@@ -44,6 +44,9 @@ public class LogisitcRegression extends RegressionModel {
         double c = coeff[2];
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = a / (1 + Math.exp(-b * (x - c)));
+            if (y < y_limits[0] || y > y_limits[1]) {
+                continue;
+            }
             xFit.add(x);
             yFit.add(y);
             if (y < y_range[0]) {
@@ -51,9 +54,6 @@ public class LogisitcRegression extends RegressionModel {
             }
             if (y > y_range[1]) {
                 y_range[1] = y;
-            }
-            if (y < y_limits[0] || y > y_limits[1]) {
-                break;
             }
         }
         //y = \frac{a}{1 + e^{-b(x - c)}}

@@ -56,6 +56,9 @@ public class PolynomialRegression extends RegressionModel {
             for (int i = coeff.length - 1; i >= 0; i--) {
                 y += coeff[i] * Math.pow(x, i); // Compute y value
             }
+            if (y < y_limits[0] || y > y_limits[1]) {
+                continue;
+            }
             xFit.add(x);
             yFit.add(y);
             if (y < y_range[0]) {
@@ -63,9 +66,6 @@ public class PolynomialRegression extends RegressionModel {
             }
             if (y > y_range[1]) {
                 y_range[1] = y;
-            }
-            if (y < y_limits[0] || y > y_limits[1]) {
-                break;
             }
         }
     }

@@ -40,6 +40,9 @@ public class LogarithmicRegression extends RegressionModel {
         }
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] + coeff[1] * Math.log(x);
+            if (y < y_limits[0] || y > y_limits[1]) {
+                continue;
+            }
             xFit.add(x);
             yFit.add(y);
             if (y < y_range[0]) {
@@ -47,9 +50,6 @@ public class LogarithmicRegression extends RegressionModel {
             }
             if (y > y_range[1]) {
                 y_range[1] = y;
-            }
-            if (y < y_limits[0] || y > y_limits[1]) {
-                break;
             }
         }
 

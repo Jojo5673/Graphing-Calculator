@@ -40,6 +40,9 @@ public class PowerRegression extends RegressionModel {
         }
         for (double x = x_range[0]; x <= x_range[1]; x += detail) {
             double y = coeff[0] * Math.pow(x, coeff[1]);
+            if (y < y_limits[0] || y > y_limits[1]) {
+                continue;
+            }
             xFit.add(x);
             yFit.add(y);
             if (y < y_range[0]) {
@@ -47,9 +50,6 @@ public class PowerRegression extends RegressionModel {
             }
             if (y > y_range[1]) {
                 y_range[1] = y;
-            }
-            if (y < y_limits[0] || y > y_limits[1]) {
-                break;
             }
         }
 
