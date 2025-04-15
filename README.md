@@ -8,3 +8,4 @@ Submission for COMP1161 course project. A graphing calculator built using **Java
 
 ## How to Run
 - Download and run the Project.jar file in builds
+- See User Guide: [User Documentation](https://docs.google.com/document/d/1szQTgGKipQ1oevdrE856exPec_XwfsJ4uhVnSZqbPgg/edit?usp=sharing)
